@@ -27,5 +27,17 @@
     - MapLibre Native SDK: `https://github.com/maplibre/maplibre-native-ios`
 6. Nhấn **Run** để khởi chạy trên trình giả lập hoặc thiết bị thật.
 
-## Liên hệ
-Dự án được phát triển bởi Công ty TNHH MTV ĐTPT Đại Thành.
+## Tự động hóa (CI/CD)
+Dự án đã được tích hợp **GitHub Actions**. Mỗi khi bạn đẩy mã nguồn lên, hệ thống sẽ tự động kiểm tra tính hợp lệ của mã nguồn trên máy chủ macOS.
+
+## Hướng dẫn Build ứng dụng (Cho người dùng máy Mac)
+1. **Tạo Xcode Project:** Nếu bạn chưa thấy tệp `.xcodeproj`, hãy mở Terminal tại thư mục dự án và chạy:
+   ```bash
+   swift package init --type executable # Nếu dùng SPM
+   ```
+   Hoặc tốt nhất, hãy mở Xcode và chọn **File -> New -> Project** -> Chọn **App** -> Đặt tên là **BaoVeRung** và kéo các tệp `.swift` vào.
+2. **Cấu hình Signing:** Chọn Target dự án, vào tab **Signing & Capabilities** để chọn Team phát triển của bạn.
+3. **Build:** Nhấn `Command + B` để biên dịch hoặc `Command + R` để chạy trên iPhone.
+
+## Xuất bản
+- Để xuất tệp `.ipa`, chọn **Product -> Archive** trong Xcode.
