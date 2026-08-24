@@ -6,7 +6,7 @@ packages:
     url: https://github.com/firebase/firebase-ios-sdk
     from: 10.0.0
   MapLibre:
-    url: https://github.com/maplibre/maplibre-native-ios
+    url: https://github.com/maplibre/maplibre-gl-native-distribution
     from: 6.0.0
 targets:
   BaoVeRung:
