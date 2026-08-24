@@ -33,24 +33,14 @@ jobs:
 
       - name: Setup GitHub Token for SPM
         run: |
-          mkdir -p ~/.config/git
-          git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
-          
-          # Configure netrc for SPM package resolution
-          cat > ~/.netrc << EOF
-          machine github.com
-          login ${{ secrets.GITHUB_TOKEN }}
-          password x-oauth-basic
-          EOF
+          echo "machine github.com login x-access-token password ${{ secrets.GITHUB_TOKEN }}" > ~/.netrc
           chmod 600 ~/.netrc
-          
-          # Configure git credentials
-          git config --global credential.helper store
-          echo "https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com" > ~/.git-credentials
-          chmod 600 ~/.git-credentials
 
       - name: Generate Xcode Project
         run: xcodegen generate
+
+      - name: Resolve Dependencies
+        run: xcodebuild -resolvePackageDependencies -project BaoVeRung.xcodeproj -scheme BaoVeRung
 
       - name: Build Archive (Unsigned)
         run: |
