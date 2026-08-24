@@ -1,0 +1,19 @@
+# Xcode
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.xcuserstate
+project.xcworkspace/
+
+# macOS
+.DS_Store
+*.swp
+*~.nib
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Firebase
+GoogleService-Info.plist

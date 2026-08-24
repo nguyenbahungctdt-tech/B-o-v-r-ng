@@ -1,0 +1,85 @@
+import SwiftUI
+
+struct SettingsScreen: View {
+    @State private var centralMeridian = "107.75"
+    @State private var zoneDegrees = "3"
+    @State private var province = "Lâm Đồng"
+
+    // Forestry specific settings
+    @State private var distUnit = "km"
+    @State private var areaUnit = "ha"
+    @State private var gpsFilter = "5.0"
+
+    let provinces = ["Lâm Đồng", "Đắk Lắk", "Gia Lai", "Kon Tum", "Đắk Nông"]
+    let distUnits = ["m", "km"]
+    let areaUnits = ["m2", "ha"]
+
+    var body: some View {
+        Form {
+            Section(header: Text("Cấu hình VN2000").font(.caption.bold())) {
+                Picker("Tỉnh thành", selection: $province) {
+                    ForEach(provinces, id: \.self) { Text($0) }
+                }
+                HStack {
+                    Text("KTT (CM)")
+                    Spacer()
+                    TextField("107.75", text: $centralMeridian)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                }
+                HStack {
+                    Text("Múi chiếu")
+                    Spacer()
+                    TextField("3", text: $zoneDegrees)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                }
+            }
+
+            Section(header: Text("Đơn vị & GPS").font(.caption.bold())) {
+                Picker("Khoảng cách", selection: $distUnit) {
+                    ForEach(distUnits, id: \.self) { Text($0) }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+
+                Picker("Diện tích", selection: $areaUnit) {
+                    ForEach(areaUnits, id: \.self) { Text($0) }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+
+                HStack {
+                    Text("Lọc GPS (mét)")
+                    Spacer()
+                    TextField("5.0", text: $gpsFilter)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                }
+            }
+
+            Section(header: Text("Tài khoản & Hệ thống").font(.caption.bold())) {
+                Button(action: {}) {
+                    Label("Kiểm tra mã kích hoạt", systemImage: "key.fill")
+                }
+                Button(action: {}) {
+                    Label("Đồng bộ ngay với Firebase", systemImage: "arrow.clockwise.icloud.fill")
+                }
+                .foregroundColor(.blue)
+
+                Button(action: {}) {
+                    Label("Đăng xuất", systemImage: "power")
+                }
+                .foregroundColor(.red)
+            }
+
+            Section(header: Text("Thông tin").font(.caption.bold())) {
+                HStack {
+                    Text("Phiên bản")
+                    Spacer()
+                    Text("1.2 (iOS 100% Match)")
+                }
+                Text("Công ty MTV ĐTPT Đại Thành")
+            }
+        }
+        .navigationTitle("Cài đặt")
+    }
+}

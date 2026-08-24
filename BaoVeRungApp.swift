@@ -1,0 +1,287 @@
+import SwiftUI
+import FirebaseCore
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+  func application(_ application: UIApplication,
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    FirebaseApp.configure()
+    return true
+  }
+}
+
+@main
+struct BaoVeRungApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    let persistenceController = PersistenceController.shared
+    @State private var isLoggedIn = false // State management like Android
+
+    var body: some Scene {
+        WindowGroup {
+            if isLoggedIn {
+                MainContainerView()
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            } else {
+                LoginView()
+                    .onTapGesture { isLoggedIn = true } // Demo transition
+            }
+        }
+    }
+}
+
+struct MainContainerView: View {
+    @State private var selectedTab = 0
+
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            MapView()
+                .tabItem {
+                    Label("BẢN ĐỒ", systemImage: "map.fill")
+                }
+                .tag(0)
+
+            GisLayersView()
+                .tabItem {
+                    Label("LỚP GIS", systemImage: "layers.fill")
+                }
+                .tag(1)
+
+            DataManagementView()
+                .tabItem {
+                    Label("DỮ LIỆU", systemImage: "folder.fill")
+                }
+                .tag(2)
+
+            SettingsView()
+                .tabItem {
+                    Label("CÀI ĐẶT", systemImage: "gearshape.fill")
+                }
+                .tag(3)
+        }
+        .accentColor(Color(red: 46/255, green: 125/255, blue: 50/255)) // Green forestry color
+    }
+}
+
+struct MapView: View {
+    @State private var azimuth: Double = 0.0
+    @State private var isLeftExpanded = true
+    @State private var isRightExpanded = true
+    @State private var showMapSource = false
+
+    var body: some View {
+        NavigationView {
+            ZStack(alignment: .topTrailing) {
+                MapLibreView()
+                    .edgesIgnoringSafeArea(.all)
+
+                // 1. LEFT SIDEBAR (Utilities)
+                VStack(alignment: .leading, spacing: 10) {
+                    Button(action: { isLeftExpanded.toggle() }) {
+                        Image(systemName: isLeftExpanded ? "chevron.left.circle.fill" : "chevron.right.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .background(Color.black.opacity(0.4).clipShape(Circle()))
+                    }
+
+                    if isLeftExpanded {
+                        VStack(spacing: 12) {
+                            Button(action: { showMapSource = true }) {
+                                Image(systemName: "layers.fill")
+                                    .padding(10)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .shadow(radius: 2)
+                            }
+
+                            Button(action: {}) {
+                                Image(systemName: "map.fill")
+                                    .padding(10)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .shadow(radius: 2)
+                            }
+
+                            Button(action: {}) {
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                    .padding(10)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .shadow(radius: 2)
+                            }
+
+                            Button(action: {}) {
+                                Image(systemName: "icloud.and.arrow.down.fill")
+                                    .padding(10)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .shadow(radius: 2)
+                            }
+                        }
+                        .transition(.move(edge: .leading))
+                    }
+                }
+                .padding(.leading, 12)
+                .padding(.top, 60)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+
+                // 2. RIGHT SIDEBAR (Zoom & GPS)
+                VStack(alignment: .trailing, spacing: 10) {
+                    Button(action: { isRightExpanded.toggle() }) {
+                        Image(systemName: isRightExpanded ? "chevron.right.circle.fill" : "chevron.left.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .background(Color.black.opacity(0.4).clipShape(Circle()))
+                    }
+
+                    if isRightExpanded {
+                        VStack(spacing: 12) {
+                            CompassView(azimuth: azimuth)
+
+                            VStack(spacing: 1) {
+                                Button(action: {}) {
+                                    Image(systemName: "plus")
+                                        .frame(width: 40, height: 40)
+                                        .background(Color.white)
+                                }
+                                Divider().frame(width: 40)
+                                Button(action: {}) {
+                                    Image(systemName: "minus")
+                                        .frame(width: 40, height: 40)
+                                        .background(Color.white)
+                                }
+                            }
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .shadow(radius: 2)
+
+                            Button(action: {}) {
+                                Image(systemName: "location.fill")
+                                    .frame(width: 40, height: 40)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .shadow(radius: 2)
+                            }
+                        }
+                        .transition(.move(edge: .trailing))
+                    }
+                }
+                .padding(.trailing, 12)
+                .padding(.top, 60)
+
+                // 3. TOP LEFT COORDINATE INFO (VN2000)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("VN2000 (Lâm Đồng)")
+                        .font(.system(size: 10, weight: .black))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.black.opacity(0.7))
+                        .foregroundColor(.white)
+                        .cornerRadius(4)
+
+                    Group {
+                        Text("X: 1,321,450.2")
+                        Text("Y: 456,780.8")
+                    }
+                    .font(.system(size: 14, weight: .black))
+                    .foregroundColor(.yellow)
+                    .shadow(color: .black, radius: 1)
+
+                    HStack(spacing: 8) {
+                        Text("±2.5m")
+                            .font(.system(size: 9, weight: .bold))
+                            .padding(.horizontal, 4)
+                            .background(Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(2)
+                        Text("Cao: 1250m")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white)
+                            .shadow(color: .black, radius: 1)
+                    }
+                }
+                .padding(.leading, 12)
+                .padding(.top, 240) // Below left sidebar
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+
+                // 4. BOTTOM FLOATING ACTION BUTTON (SURVEY)
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Button(action: {}) {
+                            Image(systemName: "plus")
+                                .font(.title.bold())
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(Color.green)
+                                .clipShape(Circle())
+                                .shadow(radius: 4)
+                        }
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 20)
+                    }
+                }
+
+                // 5. BOTTOM SATELLITE STATUS BAR
+                VStack {
+                    Spacer()
+                    SatelliteInfoView(satellitesVisible: 18, satellitesUsed: 12, accuracy: 2.5, altitude: 1250)
+                }
+            }
+            .navigationTitle("Bản đồ Lâm nghiệp")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color.green, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .actionSheet(isPresented: $showMapSource) {
+                ActionSheet(title: Text("Chọn lớp nền"), buttons: [
+                    .default(Text("Google Satellite")),
+                    .default(Text("Google Terrain")),
+                    .default(Text("OpenStreetMap")),
+                    .cancel()
+                ])
+            }
+        }
+    }
+}
+
+struct GisLayersView: View {
+    var body: some View {
+        NavigationView {
+            List {
+                Text("Danh sách lớp GIS (KML, GeoJSON, MBTiles)")
+            }
+            .navigationTitle("Lớp dữ liệu GIS")
+        }
+    }
+}
+
+struct DataView: View {
+    var body: some View {
+        NavigationView {
+            List {
+                NavigationLink(destination: WaypointsScreen()) {
+                    Label("Dữ liệu thực địa", systemImage: "folder.fill")
+                }
+                NavigationLink(destination: PatrolLogFormView()) {
+                    Label("Báo cáo sự vụ", systemImage: "doc.text.fill")
+                }
+                NavigationLink(destination: FloraFaunaFormView()) {
+                    Label("Động thực vật", systemImage: "leaf.fill")
+                }
+                NavigationLink(destination: NaturalImpactFormView()) {
+                    Label("Tác động tự nhiên", systemImage: "exclamationmark.triangle.fill")
+                }
+                NavigationLink(destination: DailyJournalFormView()) {
+                    Label("Nhật ký tuần tra", systemImage: "calendar")
+                }
+            }
+            .navigationTitle("Quản lý dữ liệu")
+        }
+    }
+}
+
+struct SettingsView: View {
+    var body: some View {
+        NavigationView {
+            SettingsScreen()
+        }
+    }
+}
