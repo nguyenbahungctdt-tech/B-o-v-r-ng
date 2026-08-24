@@ -31,6 +31,11 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      - name: Setup GitHub Token for SPM
+        run: |
+          mkdir -p ~/.config/git
+          git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
       - name: Generate Xcode Project
         run: xcodegen generate
 
