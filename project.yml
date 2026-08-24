@@ -1,6 +1,13 @@
 name: BaoVeRung
 options:
   bundleIdPrefix: com.baoverung.app
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: 10.0.0
+  MapLibre:
+    url: https://github.com/maplibre/maplibre-native-ios
+    from: 6.0.0
 targets:
   BaoVeRung:
     type: application
@@ -13,6 +20,17 @@ targets:
           - ".github/**"
           - "README.md"
           - ".gitignore"
+    dependencies:
+      - package: Firebase
+        product: FirebaseDatabase
+      - package: Firebase
+        product: FirebaseStorage
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseAnalytics
+      - package: MapLibre
+        product: MapLibre
     settings:
       INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Ứng dụng cần truy cập vị trí để ghi lại lộ trình tuần tra và tọa độ hiện trường."
       INFOPLIST_KEY_NSCameraUsageDescription: "Ứng dụng cần truy cập máy ảnh để chụp ảnh hiện trường có dấu chìm tọa độ."
