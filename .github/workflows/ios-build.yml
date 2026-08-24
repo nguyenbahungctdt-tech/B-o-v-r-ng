@@ -50,10 +50,19 @@ jobs:
             -configuration Release \
             -sdk iphoneos \
             -archivePath $PWD/build/BaoVeRung.xcarchive \
+            -allowProvisioningUpdates \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            VALIDATE_PRODUCT=NO
+            PROVISIONING_PROFILE="" \
+            PROVISIONING_PROFILE_SPECIFIER=""
+
+      - name: Verify Archive Contents
+        run: |
+          ls -la build/BaoVeRung.xcarchive/Products/Applications/
+          if [ ! -f "build/BaoVeRung.xcarchive/Products/Applications/BaoVeRung.app/Info.plist" ]; then
+            echo "ERROR: Info.plist not found in app bundle"
+            exit 1
+          fi
 
       - name: Package IPA
         run: |
