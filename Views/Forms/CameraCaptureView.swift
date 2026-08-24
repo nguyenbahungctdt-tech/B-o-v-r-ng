@@ -76,6 +76,10 @@ struct CameraCaptureView: View {
 class CameraModel: ObservableObject {
     @Published var isFlashOn = false
     @Published var session = AVCaptureSession()
+    @Published var output = AVCapturePhotoOutput()
+    @Published var preview = AVCaptureVideoPreviewLayer()
+    @Published var capturedImage: UIImage?
+    @Published var isSaved = false
 
     func checkPermissions() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -90,11 +94,52 @@ class CameraModel: ObservableObject {
     }
 
     func setup() {
-        // Basic camera setup logic
+        do {
+            self.session.beginConfiguration()
+            guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else { return }
+            let input = try AVCaptureDeviceInput(device: device)
+            if self.session.canAddInput(input) { self.session.addInput(input) }
+            if self.session.canAddOutput(self.output) { self.session.addOutput(self.output) }
+            self.session.commitConfiguration()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 
     func toggleFlash() { isFlashOn.toggle() }
-    func takePic() { /* Capture logic */ }
+
+    func takePic() {
+        let settings = AVCapturePhotoSettings()
+        settings.flashMode = isFlashOn ? .on : .off
+        self.output.capturePhoto(with: settings, delegate: PhotoReceiver(parent: self))
+    }
+}
+
+class PhotoReceiver: NSObject, AVCapturePhotoCaptureDelegate {
+    var parent: CameraModel
+    init(parent: CameraModel) { self.parent = parent }
+
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        if let error = error { print(error.localizedDescription); return }
+        guard let imageData = photo.fileDataRepresentation() else { return }
+        if let image = UIImage(data: imageData) {
+            // Apply Watermark
+            let watermarked = WatermarkHelper.shared.drawWatermark(
+                image: image,
+                userName: "Nguyen Van A",
+                time: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .medium),
+                address: "Dang xac dinh...",
+                wgs84: "11.9404, 108.4378",
+                vn2000: "X: 1321450, Y: 456781",
+                altitude: 1250,
+                accuracy: 2.5,
+                settings: WatermarkSettings()
+            )
+            DispatchQueue.main.async {
+                self.parent.capturedImage = watermarked
+            }
+        }
+    }
 }
 
 struct CameraPreview: UIViewRepresentable {
@@ -102,7 +147,14 @@ struct CameraPreview: UIViewRepresentable {
 
     func makeUIView(context: Context) -> UIView {
         let view = UIView(frame: UIScreen.main.bounds)
-        // Link AVCaptureVideoPreviewLayer
+        camera.preview.session = camera.session
+        camera.preview.videoGravity = .resizeAspectFill
+        camera.preview.frame = view.frame
+        view.layer.addSublayer(camera.preview)
+
+        DispatchQueue.global(qos: .background).async {
+            camera.session.startRunning()
+        }
         return view
     }
 

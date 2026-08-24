@@ -32,27 +32,48 @@ struct DataManagementView: View {
             // List Content
             List {
                 if selectedTab == 0 { // THEO NGÀY
-                    Section(header: HStack {
-                        Text("NGÀY 24/08/2026 (5 mục)")
-                            .font(.system(size: 12, weight: .black))
-                            .foregroundColor(.green)
-                        Spacer()
-                        Button("BÁO CÁO NGÀY") {}
-                            .font(.system(size: 10, weight: .bold))
-                    }) {
+                    Section(header: DateHeaderView(date: "24/08/2026", count: 5)) {
                         DataCardView(title: "Phá rừng trái pháp luật", type: "patrol", color: .red)
                         DataCardView(title: "Tuyến tuần tra lô 1", type: "track", color: .orange)
                         DataCardView(title: "Ảnh hiện trường cây đổ", type: "image", color: .blue)
                     }
+                } else if selectedTab == 1 { // HÌNH ẢNH
+                    DataCardView(title: "Ảnh hiện trường lô 3", type: "image", color: .blue)
+                } else if selectedTab == 6 { // SỰ VỤ
+                    DataCardView(title: "Cháy rừng tiểu khu 12", type: "patrol", color: .red)
+                } else if selectedTab == 3 { // TRACKLOG
+                    DataCardView(title: "Tuyến tuần tra ngày 23/08", type: "track", color: .orange)
                 } else {
-                    Text("Danh sách \(tabs[selectedTab]) sẽ hiển thị ở đây...")
+                    Text("Danh sách \(tabs[selectedTab]) trống")
                         .foregroundColor(.gray)
+                        .padding()
                 }
             }
             .listStyle(PlainListStyle())
         }
         .navigationTitle("QUẢN LÝ DỮ LIỆU")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct DateHeaderView: View {
+    let date: String
+    let count: Int
+    var body: some View {
+        HStack {
+            Text("NGÀY \(date) (\(count) mục)")
+                .font(.system(size: 12, weight: .black))
+                .foregroundColor(.green)
+            Spacer()
+            Button("BÁO CÁO NGÀY") {}
+                .font(.system(size: 10, weight: .bold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(6)
+        }
+        .padding(.vertical, 5)
     }
 }
 

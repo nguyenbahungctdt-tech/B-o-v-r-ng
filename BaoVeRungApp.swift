@@ -39,7 +39,7 @@ struct MainContainerView: View {
                 }
                 .tag(0)
 
-            GisLayersView()
+            GisLayersScreen()
                 .tabItem {
                     Label("LỚP GIS", systemImage: "layers.fill")
                 }
