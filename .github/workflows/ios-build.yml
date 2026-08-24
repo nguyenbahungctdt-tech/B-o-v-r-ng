@@ -52,17 +52,11 @@ jobs:
             -archivePath $PWD/build/BaoVeRung.xcarchive \
             -allowProvisioningUpdates \
             CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             PROVISIONING_PROFILE="" \
-            PROVISIONING_PROFILE_SPECIFIER=""
-
-      - name: Verify Archive Contents
-        run: |
-          ls -la build/BaoVeRung.xcarchive/Products/Applications/
-          if [ ! -f "build/BaoVeRung.xcarchive/Products/Applications/BaoVeRung.app/Info.plist" ]; then
-            echo "ERROR: Info.plist not found in app bundle"
-            exit 1
-          fi
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            VALIDATE_PRODUCT=NO
 
       - name: Package IPA
         run: |

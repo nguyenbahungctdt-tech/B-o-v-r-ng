@@ -14,12 +14,12 @@ targets:
     platform: iOS
     deploymentTarget: "15.0"
     sources:
-      - path: .
-        excludes:
-          - "project.yml"
-          - ".github/**"
-          - "README.md"
-          - ".gitignore"
+      - BaoVeRungApp.swift
+      - Assets.xcassets
+      - Data
+      - Repositories
+      - Utils
+      - Views
     dependencies:
       - package: Firebase
         product: FirebaseDatabase
@@ -32,6 +32,7 @@ targets:
       - package: MapLibre
         product: MapLibre
     settings:
+      GENERATE_INFOPLIST_FILE: YES
       INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Ứng dụng cần truy cập vị trí để ghi lại lộ trình tuần tra và tọa độ hiện trường."
       INFOPLIST_KEY_NSCameraUsageDescription: "Ứng dụng cần truy cập máy ảnh để chụp ảnh hiện trường có dấu chìm tọa độ."
       INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Ứng dụng cần truy cập thư viện ảnh để đính kèm hình ảnh vào báo cáo."
