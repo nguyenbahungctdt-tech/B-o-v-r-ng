@@ -36,6 +36,7 @@ targets:
       INFOPLIST_KEY_NSCameraUsageDescription: "Ứng dụng cần truy cập máy ảnh để chụp ảnh hiện trường có dấu chìm tọa độ."
       INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Ứng dụng cần truy cập thư viện ảnh để đính kèm hình ảnh vào báo cáo."
       INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription: "Ứng dụng cần truy cập vị trí liên tục để ghi Tracklog tuần tra ngay cả khi màn hình tắt."
+      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       CODE_SIGNING_ALLOWED: NO
       CODE_SIGNING_REQUIRED: NO
       CODE_SIGN_IDENTITY: ""

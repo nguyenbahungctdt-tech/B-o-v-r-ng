@@ -14,6 +14,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Prepare App Icons
+        run: |
+          ICON_PATH="Assets.xcassets/AppIcon.appiconset"
+          SOURCE_ICON="$ICON_PATH/app_icon_forestry.jpg"
+          TARGET_ICON="$ICON_PATH/icon-1024.png"
+          
+          if [ -f "$SOURCE_ICON" ]; then
+            echo "Resizing $SOURCE_ICON to 1024x1024 PNG..."
+            sips -s format png -z 1024 1024 "$SOURCE_ICON" --out "$TARGET_ICON"
+          else
+            echo "Error: Source icon not found at $SOURCE_ICON"
+            exit 1
+          fi
+
       - name: Install XcodeGen
         run: brew install xcodegen
 
