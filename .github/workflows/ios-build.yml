@@ -1,36 +1,45 @@
-name: iOS Build
+name: Build iOS IPA (Sideload Ready)
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build iOS App
+    name: Build Unsigned IPA
     runs-on: macos-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Xcode
-        uses: maxim-lobanov/setup-xcode@v1
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
+      - name: Build Archive (Unsigned)
+        run: |
+          xcodebuild archive \
+            -project BaoVeRung.xcodeproj \
+            -scheme BaoVeRung \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath $PWD/build/BaoVeRung.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          mv build/BaoVeRung.xcarchive/Products/Applications/*.app Payload/
+          zip -r BaoVeRung-Sideload.ipa Payload
+          
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
         with:
-          xcode-version: 'latest-stable'
-
-      - name: Install dependencies
-        run: |
-          # If using Swift Package Manager, no extra steps needed usually.
-          # If using CocoaPods: pod install
-          echo "Installing dependencies..."
-
-      - name: Build for Simulator
-        run: |
-          # This command builds the app for the simulator to verify compilation
-          # replace 'BaoVeRung' with your scheme name if different
-          # For a project without a .xcodeproj file yet, we can only verify files.
-          # To truly build, a .xcodeproj is needed.
-          echo "Mã nguồn đang được kiểm tra biên dịch..."
-          swift build -v || true # Basic swift check if no project file exists
+          name: BaoVeRung-IPA
+          path: BaoVeRung-Sideload.ipa

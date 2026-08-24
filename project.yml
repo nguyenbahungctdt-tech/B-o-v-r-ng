@@ -1,0 +1,23 @@
+name: BaoVeRung
+options:
+  bundleIdPrefix: com.baoverung.app
+targets:
+  BaoVeRung:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: .
+        excludes:
+          - "project.yml"
+          - ".github/**"
+          - "README.md"
+          - ".gitignore"
+    settings:
+      INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Ứng dụng cần truy cập vị trí để ghi lại lộ trình tuần tra và tọa độ hiện trường."
+      INFOPLIST_KEY_NSCameraUsageDescription: "Ứng dụng cần truy cập máy ảnh để chụp ảnh hiện trường có dấu chìm tọa độ."
+      INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Ứng dụng cần truy cập thư viện ảnh để đính kèm hình ảnh vào báo cáo."
+      INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription: "Ứng dụng cần truy cập vị trí liên tục để ghi Tracklog tuần tra ngay cả khi màn hình tắt."
+      CODE_SIGNING_ALLOWED: NO
+      CODE_SIGNING_REQUIRED: NO
+      CODE_SIGN_IDENTITY: ""
