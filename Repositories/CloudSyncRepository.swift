@@ -94,7 +94,7 @@ class CloudSyncRepository {
 
             return KeyValidationResult(isValid: true, message: dateStr, permissions: perms, autoGpx: autoGpx, canSync: canSync)
         } catch {
-            return KeyValidationResult(isValid: false, message: "Lỗi kết nối: \(error.localizedMessage)")
+            return KeyValidationResult(isValid: false, message: "Lỗi kết nối: \(error.localizedDescription)")
         }
     }
 

@@ -17,7 +17,7 @@ struct DatumShift: Codable {
     var ry: Double = 0.0
     var rz: Double = 0.0
     var ds: Double = 0.0
-    var is7Param: Boolean = false
+    var is7Param: Bool = false
 }
 
 class CoordinateConverter {

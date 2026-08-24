@@ -66,6 +66,8 @@ struct MapView: View {
     @State private var isLeftExpanded = true
     @State private var isRightExpanded = true
     @State private var showMapSource = false
+    @State private var showCoordConverter = false
+    @State private var showCamera = false
 
     var body: some View {
         NavigationView {
@@ -100,7 +102,7 @@ struct MapView: View {
                                     .shadow(radius: 2)
                             }
 
-                            Button(action: {}) {
+                            Button(action: { showCoordConverter = true }) {
                                 Image(systemName: "arrow.triangle.2.circlepath")
                                     .padding(10)
                                     .background(Color.white)
@@ -228,15 +230,26 @@ struct MapView: View {
             }
             .navigationTitle("Bản đồ Lâm nghiệp")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.green, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .navigationBarItems(trailing: Button(action: { showCamera = true }) {
+                Image(systemName: "camera.fill")
+                    .foregroundColor(.white)
+            })
+            // Support iOS 15.5+ by removing iOS 16 specific modifiers or using availability
             .actionSheet(isPresented: $showMapSource) {
                 ActionSheet(title: Text("Chọn lớp nền"), buttons: [
                     .default(Text("Google Satellite")),
+                    .default(Text("Google Hybrid")),
+                    .default(Text("Esri World Imagery")),
                     .default(Text("Google Terrain")),
                     .default(Text("OpenStreetMap")),
                     .cancel()
                 ])
+            }
+            .sheet(isPresented: $showCoordConverter) {
+                CoordinateConverterView()
+            }
+            .fullScreenCover(isPresented: $showCamera) {
+                CameraCaptureView()
             }
         }
     }
