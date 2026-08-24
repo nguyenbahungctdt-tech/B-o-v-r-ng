@@ -36,17 +36,18 @@ jobs:
           mkdir -p ~/.config/git
           git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
           
-          # Also set credentials in git credential helper for SPM
+          # Configure netrc for SPM package resolution
+          cat > ~/.netrc << EOF
+          machine github.com
+          login ${{ secrets.GITHUB_TOKEN }}
+          password x-oauth-basic
+          EOF
+          chmod 600 ~/.netrc
+          
+          # Configure git credentials
           git config --global credential.helper store
           echo "https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com" > ~/.git-credentials
           chmod 600 ~/.git-credentials
-          
-          # Configure netrc as fallback for SPM
-          mkdir -p ~/.ssh
-          echo "machine github.com" > ~/.netrc
-          echo "login ${{ secrets.GITHUB_TOKEN }}" >> ~/.netrc
-          echo "password x-oauth-basic" >> ~/.netrc
-          chmod 600 ~/.netrc
 
       - name: Generate Xcode Project
         run: xcodegen generate
