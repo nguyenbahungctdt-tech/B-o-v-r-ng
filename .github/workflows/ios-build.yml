@@ -52,7 +52,8 @@ jobs:
             -archivePath $PWD/build/BaoVeRung.xcarchive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=""
+            CODE_SIGN_IDENTITY="" \
+            VALIDATE_PRODUCT=NO
 
       - name: Package IPA
         run: |
