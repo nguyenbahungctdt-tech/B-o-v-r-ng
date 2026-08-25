@@ -14,14 +14,14 @@ targets:
     platform: iOS
     deploymentTarget: "15.5"
     sources:
-      - path: .
-        excludes:
-          - "project.yml"
-          - ".github"
-          - "README.md"
-          - ".gitignore"
-          - "*.xcodeproj"
-          - "build"
+      - BaoVeRungApp.swift
+      - Assets.xcassets
+      - Data
+      - Repositories
+      - Utils
+      - Views
+      - GoogleService-Info.plist
+      - Info.plist
     dependencies:
       - package: Firebase
         product: FirebaseDatabase
@@ -34,14 +34,10 @@ targets:
       - package: MapLibre
         product: MapLibre
     settings:
-      GENERATE_INFOPLIST_FILE: YES
+      INFOPLIST_FILE: Info.plist
       TARGETED_DEVICE_FAMILY: "1"
       MARKETING_VERSION: "1.2"
       CURRENT_PROJECT_VERSION: "3"
-      INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Ứng dụng cần truy cập vị trí để ghi lại lộ trình tuần tra và tọa độ hiện trường."
-      INFOPLIST_KEY_NSCameraUsageDescription: "Ứng dụng cần truy cập máy ảnh để chụp ảnh hiện trường có dấu chìm tọa độ."
-      INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Ứng dụng cần truy cập thư viện ảnh để đính kèm hình ảnh vào báo cáo."
-      INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription: "Ứng dụng cần truy cập vị trí liên tục để ghi Tracklog tuần tra ngay cả khi màn hình tắt."
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       CODE_SIGNING_ALLOWED: NO
       CODE_SIGNING_REQUIRED: NO
