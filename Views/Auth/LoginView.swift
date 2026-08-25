@@ -1,13 +1,16 @@
 import SwiftUI
 
 struct LoginView: View {
+    var onLoginSuccess: () -> Void
     @State private var name = ""
     @State private var email = ""
     @State private var phone = ""
     @State private var unit = "Công ty TNHH MTV ĐTPT ĐẠI THÀNH"
-    @State private var department = ""
+    @State private var department = "Ban Giám Đốc"
     @State private var activationKey = ""
     @State private var isOffline = false
+    @State private var isLoading = false
+    @State private var errorMessage: String? = nil
 
     let units = ["Công ty TNHH MTV ĐTPT ĐẠI THÀNH", "Khác"]
     let departments = ["Ban Giám Đốc", "Phòng QL,SD&PTR", "Phân Trường I", "Phân Trường II", "Phân Trường III", "Phân Trường IV", "Phân Trường V", "Phân Trường VI", "Khác"]
@@ -94,21 +97,40 @@ struct LoginView: View {
                             LoginTextField(icon: "key.fill", placeholder: "Mã kích hoạt ứng dụng", text: $activationKey)
                         }
 
-                        Button(action: {}) {
+                        if let error = errorMessage {
+                            Text(error)
+                                .font(.caption.bold())
+                                .foregroundColor(.red)
+                                .frame(maxWidth: .infinity)
+                                .padding(8)
+                                .background(Color.red.opacity(0.1))
+                                .cornerRadius(8)
+                        }
+
+                        Button(action: performLogin) {
                             HStack {
-                                Image(systemName: "icloud.and.arrow.up.fill")
-                                Text("KÍCH HOẠT VÀ ĐĂNG KÝ")
-                                    .fontWeight(.black)
+                                if isLoading {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                } else {
+                                    Image(systemName: "icloud.and.arrow.up.fill")
+                                    Text("KÍCH HOẠT VÀ ĐĂNG KÝ")
+                                        .fontWeight(.black)
+                                }
                             }
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.green)
+                            .background(isLoading ? Color.gray : Color.green)
                             .foregroundColor(.white)
                             .cornerRadius(12)
                         }
+                        .disabled(isLoading)
                         .padding(.top, 10)
 
-                        Button(action: { isOffline = true }) {
+                        Button(action: {
+                            isOffline = true
+                            onLoginSuccess()
+                        }) {
                             HStack {
                                 Image(systemName: "wifi.slash")
                                 Text("Dùng thử ngoại tuyến")
@@ -134,6 +156,50 @@ struct LoginView: View {
                     .padding(.bottom, 20)
                 }
                 .padding(.horizontal, 20)
+            }
+        }
+    }
+
+    private func performLogin() {
+        guard !name.isEmpty, !email.isEmpty, !activationKey.isEmpty else {
+            errorMessage = "Vui lòng điền đầy đủ thông tin!"
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+
+        let userInfo = [
+            "name": name,
+            "email": email,
+            "phone": phone,
+            "unit": unit,
+            "dept": department
+        ]
+
+        Task {
+            let result = await CloudSyncRepository.shared.verifyActivationKey(
+                key: activationKey,
+                deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "ios-device",
+                userInfo: userInfo
+            )
+
+            DispatchQueue.main.async {
+                isLoading = false
+                if result.isValid {
+                    // Update global personnel info
+                    Task {
+                        await CloudSyncRepository.shared.updatePersonnelInfo(
+                            user: userInfo,
+                            registrationKey: activationKey,
+                            permissions: result.permissions,
+                            canSync: result.canSync
+                        )
+                    }
+                    onLoginSuccess()
+                } else {
+                    errorMessage = result.message ?? "Lỗi xác thực không xác định"
+                }
             }
         }
     }

@@ -30,8 +30,9 @@ struct BaoVeRungApp: App {
                 MainContainerView()
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
             } else {
-                LoginView()
-                    .onTapGesture { isLoggedIn = true } // Demo transition
+                LoginView(onLoginSuccess: {
+                    isLoggedIn = true
+                })
             }
         }
     }

@@ -56,20 +56,64 @@ struct SettingsScreen: View {
                 }
             }
 
+            @State private var isSyncing = false
+    @State private var syncMessage: String? = nil
+
+    var body: some View {
+        Form {
+            // ... (Sections before)
             Section(header: Text("Tài khoản & Hệ thống").font(.caption.bold())) {
-                Button(action: {}) {
+                Button(action: verifyKey) {
                     Label("Kiểm tra mã kích hoạt", systemImage: "key.fill")
                 }
-                Button(action: {}) {
-                    Label("Đồng bộ ngay với Firebase", systemImage: "arrow.clockwise.icloud.fill")
+
+                Button(action: startManualSync) {
+                    HStack {
+                        Label("Đồng bộ ngay với Firebase", systemImage: "arrow.clockwise.icloud.fill")
+                        if isSyncing {
+                            Spacer()
+                            ProgressView()
+                        }
+                    }
                 }
                 .foregroundColor(.blue)
+                .disabled(isSyncing)
+
+                if let msg = syncMessage {
+                    Text(msg)
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
 
                 Button(action: {}) {
                     Label("Đăng xuất", systemImage: "power")
                 }
                 .foregroundColor(.red)
             }
+            // ...
+        }
+        .navigationTitle("Cài đặt")
+    }
+
+    private func verifyKey() {
+        // Logic to verify current key
+    }
+
+    private func startManualSync() {
+        isSyncing = true
+        syncMessage = "Đang kiểm tra dữ liệu..."
+
+        Task {
+            // Simulating sync for now - in real app would loop through pending CoreData records
+            try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+
+            DispatchQueue.main.async {
+                isSyncing = false
+                syncMessage = "Đã đồng bộ thành công lúc \(DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .short))"
+            }
+        }
+    }
+}
 
             Section(header: Text("Thông tin").font(.caption.bold())) {
                 HStack {

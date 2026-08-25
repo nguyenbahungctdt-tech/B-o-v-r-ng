@@ -20,6 +20,7 @@ targets:
       - Repositories
       - Utils
       - Views
+      - GoogleService-Info.plist
     dependencies:
       - package: Firebase
         product: FirebaseDatabase
