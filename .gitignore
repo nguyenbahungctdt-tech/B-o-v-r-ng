@@ -15,5 +15,5 @@ project.xcworkspace/
 .build/
 .swiftpm/
 
-# Firebase
-GoogleService-Info.plist
+# Firebase (Remove from ignore to allow build on GitHub with dummy file)
+# GoogleService-Info.plist
