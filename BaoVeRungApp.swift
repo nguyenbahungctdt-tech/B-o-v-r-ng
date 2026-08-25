@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseCore
+import CoreLocation
 
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
@@ -114,8 +115,7 @@ struct MapView: View {
 
                         HStack(spacing: 4) {
                             Image(systemName: "scope")
-                            let acc = locationManager.location?.horizontalAccuracy ?? 0
-                            Text("Sai số: ±\(String(format: "%.1f", acc))m")
+                            Text("Sai số: ±\(String(format: "%.1f", locationManager.location?.horizontalAccuracy ?? 0))m")
                         }
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)

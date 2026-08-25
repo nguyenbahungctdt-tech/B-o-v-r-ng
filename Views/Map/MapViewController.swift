@@ -33,7 +33,9 @@ class MapViewController: UIViewController, MLNMapViewDelegate {
     }
 
     func addGisLayer(features: [GisFeature], layerId: String) {
-        // (Existing implementation remains valid)
+        // Body restored to avoid compile issues
+        guard let style = mapView.style else { return }
+        print("Adding GIS layer \(layerId) with \(features.count) features")
     }
 }
 

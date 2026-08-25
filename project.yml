@@ -20,8 +20,8 @@ targets:
       - Repositories
       - Utils
       - Views
-      - GoogleService-Info.plist
-      - Info.plist
+      - path: GoogleService-Info.plist
+        type: resource
     dependencies:
       - package: Firebase
         product: FirebaseDatabase
