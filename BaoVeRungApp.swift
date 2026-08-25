@@ -227,22 +227,23 @@ struct MapView: View {
                 // 4. BOTTOM INFO CARD (7 Lines)
                 VStack {
                     Spacer()
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 6) {
                         HStack {
-                            Text("VN2000 / TM-3 kinh tuyến trục 107.75 + Lâm Đồng")
-                                .font(.system(size: 11, weight: .black))
+                            let sys = CoordinateConverter.shared.systems.first { $0.id == "9027" } ?? CoordinateConverter.shared.systems[0]
+                            Text(sys.name)
+                                .font(.system(size: 10, weight: .black))
                                 .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
                             Spacer()
                             Image(systemName: isCoordInfoExpanded ? "chevron.down" : "chevron.up")
                         }
-                        .onTapGesture { isCoordInfoExpanded.toggle() }
+                        .onTapGesture { withAnimation { isCoordInfoExpanded.toggle() } }
 
                         if isCoordInfoExpanded {
-                            let loc = locationManager.location?.coordinate ?? CLLocationCoordinate2D(latitude: 0, longitude: 0)
+                            let loc = locationManager.location?.coordinate ?? CLLocationCoordinate2D(latitude: 11.9404, longitude: 108.4378)
                             let vn = CoordinateConverter.shared.wgs84ToVn2000(lat: loc.latitude, lon: loc.longitude, cm: 107.75, zd: 3)
 
                             Text("X: \(String(format: "%.1f", vn.x))  Y: \(String(format: "%.1f", vn.y))")
-                                .font(.system(size: 18, weight: .black))
+                                .font(.system(size: 20, weight: .black))
                                 .foregroundColor(.black)
 
                             Text("Vị trí WGS84: \(String(format: "%.6f", loc.latitude)), \(String(format: "%.6f", loc.longitude))")
@@ -253,7 +254,7 @@ struct MapView: View {
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundColor(.gray)
 
-                            HStack(spacing: 15) {
+                            HStack(spacing: 12) {
                                 let acc = locationManager.location?.horizontalAccuracy ?? 0
                                 Text("±\(String(format: "%.1f", acc))m")
                                     .font(.system(size: 9, weight: .black))
@@ -273,11 +274,11 @@ struct MapView: View {
                             }
                         }
                     }
-                    .padding(15)
+                    .padding(14)
                     .background(Color.white.opacity(0.95))
                     .cornerRadius(18)
                     .shadow(radius: 5)
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, 10)
                     .padding(.bottom, 25)
                 }
 

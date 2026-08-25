@@ -4,7 +4,8 @@ import SwiftUI
 
 class MapViewController: UIViewController, MLNMapViewDelegate {
     var mapView: MLNMapView!
-    var currentStyleURL: URL = URL(string: "https://demotiles.maplibre.org/style.json")!
+    // Default to Google Satellite
+    var currentStyleURL: URL = URL(string: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}")!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,6 +19,15 @@ class MapViewController: UIViewController, MLNMapViewDelegate {
         mapView.showsUserLocation = true
 
         view.addSubview(mapView)
+
+        // Initial layer loading
+        loadDefaultLayers()
+    }
+
+    private func loadDefaultLayers() {
+        // Here we would load default_map_SDD.mbtiles and default_map_Kk2025.mbtiles
+        // if they exist in the app bundle or documents
+        print("Initializing default GIS layers...")
     }
 
     func updateStyle(url: String) {
