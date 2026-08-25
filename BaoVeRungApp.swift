@@ -265,42 +265,6 @@ struct MapView: View {
     }
 }
 
-struct GisLayersView: View {
-    var body: some View {
-        NavigationView {
-            List {
-                Text("Danh sách lớp GIS (KML, GeoJSON, MBTiles)")
-            }
-            .navigationTitle("Lớp dữ liệu GIS")
-        }
-    }
-}
-
-struct DataView: View {
-    var body: some View {
-        NavigationView {
-            List {
-                NavigationLink(destination: WaypointsScreen()) {
-                    Label("Dữ liệu thực địa", systemImage: "folder.fill")
-                }
-                NavigationLink(destination: PatrolLogFormView()) {
-                    Label("Báo cáo sự vụ", systemImage: "doc.text.fill")
-                }
-                NavigationLink(destination: FloraFaunaFormView()) {
-                    Label("Động thực vật", systemImage: "leaf.fill")
-                }
-                NavigationLink(destination: NaturalImpactFormView()) {
-                    Label("Tác động tự nhiên", systemImage: "exclamationmark.triangle.fill")
-                }
-                NavigationLink(destination: DailyJournalFormView()) {
-                    Label("Nhật ký tuần tra", systemImage: "calendar")
-                }
-            }
-            .navigationTitle("Quản lý dữ liệu")
-        }
-    }
-}
-
 struct SettingsView: View {
     var body: some View {
         NavigationView {
