@@ -63,8 +63,8 @@ struct LoginView: View {
                                 .foregroundColor(.white)
                                 .tracking(2)
 
-                            Text("- ĐẠI THÀNH -")
-                                .font(.system(size: 16, weight: .bold))
+                            Text("Công ty TNHH MTV ĐTPT Đại Thành")
+                                .font(.system(size: 15, weight: .bold))
                                 .foregroundColor(.white.opacity(0.95))
                                 .padding(.top, -5)
                         }
@@ -79,9 +79,9 @@ struct LoginView: View {
                             .padding(.bottom, 5)
 
                         Group {
-                            LoginField(icon: "person.fill", placeholder: "Họ tên cán bộ thực hiện", text: $name, hint: "Gợi ý: Nguyễn Bá Hưng")
-                            LoginField(icon: "envelope.fill", placeholder: "Địa chỉ Gmail", text: $email, hint: "Gợi ý: nguyenbahung.ctdt@gmail.com")
-                            LoginField(icon: "phone.fill", placeholder: "Số điện thoại liên lạc", text: $phone, hint: "Gợi ý: 0986407464", keyboardType: .numberPad)
+                            LoginField(icon: "person.fill", placeholder: "Họ tên cán bộ thực hiện", text: $name, hint: "Theo phiên đăng nhập của lần trước: Nguyễn Bá Hưng")
+                            LoginField(icon: "envelope.fill", placeholder: "Địa chỉ Gmail", text: $email, hint: "Theo phiên đăng nhập của lần trước: nguyenbahung.ctdt@gmail.com")
+                            LoginField(icon: "phone.fill", placeholder: "Số điện thoại liên lạc", text: $phone, hint: "Theo phiên đăng nhập của lần trước: 0986407464", keyboardType: .numberPad)
                         }
 
                         // Unit Picker with "Other" logic

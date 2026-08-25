@@ -43,7 +43,7 @@ struct ProfileView: View {
                                 .foregroundColor(.white)
                                 .tracking(2)
 
-                            Text("- ĐẠI THÀNH -")
+                            Text("Công ty TNHH MTV ĐTPT Đại Thành")
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(.white.opacity(0.9))
                         }
