@@ -1,13 +1,7 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @State private var officerName = "Nguyễn Bá Hưng"
-    @State private var email = "nguyenbahung.ctdt@gmail.com"
-    @State private var phone = "0986407464"
-    @State private var unit = "Công ty TNHH MTV ĐTPT ĐẠI THÀNH"
-    @State private var department = "Phòng QL,SD&PTR"
-    @State private var expiryDate = "2027-01-02"
-    @State private var permissions = "FULL"
+    @EnvironmentObject var preferences: UserPreferences
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -30,11 +24,11 @@ struct ProfileView: View {
                                 .frame(width: 105, height: 100)
                                 .shadow(radius: 5)
 
-                            Image(systemName: "leaf.fill")
+                            Image("app_icon_forestry")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 65, height: 65)
-                                .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
+                                .frame(width: 75, height: 75)
+                                .clipShape(Circle())
                         }
 
                         VStack(spacing: 2) {
@@ -64,24 +58,24 @@ struct ProfileView: View {
                             Spacer()
                         }
 
-                        Text(officerName)
+                        Text(preferences.registeredName)
                             .font(.system(size: 24, weight: .black))
                             .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding(.bottom, 5)
 
                         VStack(alignment: .leading, spacing: 10) {
-                            ProfileInfoRow(label: "Họ tên:", value: officerName)
-                            ProfileInfoRow(label: "Gmail:", value: email)
-                            ProfileInfoRow(label: "Số điện thoại:", value: phone)
-                            ProfileInfoRow(label: "Đơn vị:", value: unit)
-                            ProfileInfoRow(label: "Bộ phận:", value: department)
+                            ProfileInfoRow(label: "Họ tên:", value: preferences.registeredName)
+                            ProfileInfoRow(label: "Gmail:", value: preferences.registeredEmail)
+                            ProfileInfoRow(label: "Số điện thoại:", value: preferences.registeredPhone)
+                            ProfileInfoRow(label: "Đơn vị:", value: preferences.registeredUnit)
+                            ProfileInfoRow(label: "Bộ phận:", value: preferences.registeredDept)
 
                             HStack {
                                 Text("Quyền hạn:")
                                     .font(.system(size: 14, weight: .bold))
                                     .foregroundColor(.gray)
-                                Text(permissions)
+                                Text(preferences.permissions)
                                     .font(.system(size: 14, weight: .black))
                                     .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
                             }
@@ -94,7 +88,7 @@ struct ProfileView: View {
                             Text("Hạn sử dụng:")
                                 .font(.system(size: 14, weight: .bold))
                             Spacer()
-                            Text(expiryDate)
+                            Text(preferences.expiryDate)
                                 .font(.system(size: 14, weight: .black))
                                 .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
                         }
@@ -143,24 +137,6 @@ struct ProfileView: View {
                 }
                 .padding(.bottom, 50)
             }
-        }
-    }
-}
-
-struct ProfileInfoRow: View {
-    let label: String
-    let value: String
-
-    var body: some View {
-        HStack(alignment: .top) {
-            Text(label)
-                .font(.system(size: 14, weight: .bold))
-                .foregroundColor(.gray)
-                .frame(width: 100, alignment: .leading)
-            Text(value)
-                .font(.system(size: 14, weight: .bold))
-                .foregroundColor(.black)
-            Spacer()
         }
     }
 }

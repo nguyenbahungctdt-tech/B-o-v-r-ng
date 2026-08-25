@@ -24,6 +24,7 @@ struct BaoVeRungApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     let persistenceController = PersistenceController.shared
     @StateObject var locationManager = LocationManager()
+    @StateObject var preferences = UserPreferences.shared
     @State private var isLoggedIn = false
 
     var body: some Scene {
@@ -32,6 +33,7 @@ struct BaoVeRungApp: App {
                 MainContainerView()
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environmentObject(locationManager)
+                    .environmentObject(preferences)
             } else {
                 LoginView(onLoginSuccess: {
                     isLoggedIn = true
@@ -83,6 +85,7 @@ struct MainContainerView: View {
 
 struct MapView: View {
     @EnvironmentObject var locationManager: LocationManager
+    @EnvironmentObject var preferences: UserPreferences
     @State private var azimuth: Double = 0.0
     @State private var isLeftExpanded = true
     @State private var isRightExpanded = true
@@ -92,15 +95,19 @@ struct MapView: View {
     @State private var showCamera = false
     @State private var isCoordInfoExpanded = true
     @State private var isFABMenuExpanded = false
+    @State private var showAddWaypoint = false
+    @State private var measureMode: Int = 0 // 0: None, 1: Distance, 2: Area
+    @State private var measurePoints: [CLLocationCoordinate2D] = []
 
-    @State private var mapCenter: CLLocationCoordinate2D?
+    @State private var mapCenter: CLLocationCoordinate2D? = CLLocationCoordinate2D(latitude: 11.9404, longitude: 108.4378)
+    @State private var jumpToCoordinate: CLLocationCoordinate2D?
     @State private var zoomLevel: Double = 14.0
-    @State private var styleURL: String = "https://demotiles.maplibre.org/style.json"
+    @State private var styleURL: String = "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
 
     var body: some View {
         NavigationView {
             ZStack(alignment: .topTrailing) {
-                MapLibreView(centerCoordinate: $mapCenter, zoomLevel: $zoomLevel, styleURL: $styleURL)
+                MapLibreView(centerCoordinate: $jumpToCoordinate, mapCenter: $mapCenter, zoomLevel: $zoomLevel, styleURL: $styleURL)
                     .edgesIgnoringSafeArea(.all)
 
                 // 1. TOP STATUS BAR (Vệ tinh, Sai số, Đám mây)
@@ -196,7 +203,8 @@ struct MapView: View {
 
                     if isRightExpanded {
                         VStack(spacing: 12) {
-                            SidebarButton(icon: "gearshape.fill")
+                            SidebarButton(icon: "gearshape.fill", action: { selectedTab = 3 })
+                            SidebarButton(icon: "ruler.fill")
                             SidebarButton(icon: "plus", action: { zoomLevel = min(zoomLevel + 1, 20) })
                             SidebarButton(icon: "minus", action: { zoomLevel = max(zoomLevel - 1, 1) })
 
@@ -214,7 +222,7 @@ struct MapView: View {
                             SidebarButton(icon: "arrow.up", action: { azimuth = 0 })
                             SidebarButton(icon: "scope", color: .green, action: {
                                 if let loc = locationManager.location {
-                                    mapCenter = loc.coordinate
+                                    jumpToCoordinate = loc.coordinate
                                 }
                             })
                         }
@@ -229,9 +237,9 @@ struct MapView: View {
                     Spacer()
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
-                            let sys = CoordinateConverter.shared.systems.first { $0.id == "9027" } ?? CoordinateConverter.shared.systems[0]
+                            let sys = CoordinateConverter.shared.systems.first { $0.id == preferences.activeCoordSystemId } ?? CoordinateConverter.shared.systems[0]
                             Text(sys.name)
-                                .font(.system(size: 10, weight: .black))
+                                .font(.system(size: 11, weight: .black))
                                 .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
                             Spacer()
                             Image(systemName: isCoordInfoExpanded ? "chevron.down" : "chevron.up")
@@ -239,10 +247,13 @@ struct MapView: View {
                         .onTapGesture { withAnimation { isCoordInfoExpanded.toggle() } }
 
                         if isCoordInfoExpanded {
-                            let loc = locationManager.location?.coordinate ?? CLLocationCoordinate2D(latitude: 11.9404, longitude: 108.4378)
-                            let vn = CoordinateConverter.shared.wgs84ToVn2000(lat: loc.latitude, lon: loc.longitude, cm: 107.75, zd: 3)
+                            let loc = locationManager.location?.coordinate ?? CLLocationCoordinate2D(latitude: 0, longitude: 0)
+                            let currentVn = CoordinateConverter.shared.wgs84ToVn2000(lat: loc.latitude, lon: loc.longitude, cm: preferences.vn2000CentralMeridian, zd: preferences.vn2000ZoneDegrees)
 
-                            Text("X: \(String(format: "%.1f", vn.x))  Y: \(String(format: "%.1f", vn.y))")
+                            let center = mapCenter ?? CLLocationCoordinate2D(latitude: 0, longitude: 0)
+                            let centerVn = CoordinateConverter.shared.wgs84ToVn2000(lat: center.latitude, lon: center.longitude, cm: preferences.vn2000CentralMeridian, zd: preferences.vn2000ZoneDegrees)
+
+                            Text("X: \(String(format: "%.1f", currentVn.x))  Y: \(String(format: "%.1f", currentVn.y))")
                                 .font(.system(size: 20, weight: .black))
                                 .foregroundColor(.black)
 
@@ -250,7 +261,7 @@ struct MapView: View {
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
 
-                            Text("Tâm X: \(String(format: "%.1f", vn.x))  Y: \(String(format: "%.1f", vn.y))")
+                            Text("Tâm X: \(String(format: "%.1f", centerVn.x))  Y: \(String(format: "%.1f", centerVn.y))")
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundColor(.gray)
 
@@ -264,7 +275,9 @@ struct MapView: View {
                                     .foregroundColor(.white)
                                     .cornerRadius(4)
 
-                                Text("Cao: \(String(format: "%.1f", locationManager.location?.altitude ?? 0))m")
+                                let alt = locationManager.location?.altitude ?? 0
+                                let vAcc = locationManager.location?.verticalAccuracy ?? 0
+                                Text("Cao: \(String(format: "%.1f", alt))m (±\(String(format: "%.0f", vAcc))m)")
                                     .font(.system(size: 11, weight: .bold))
                                     .foregroundColor(.gray)
 
@@ -287,13 +300,16 @@ struct MapView: View {
                     Spacer()
                     HStack {
                         Spacer()
-                        VStack(spacing: 15) {
+                        VStack(spacing: 0) {
                             if isFABMenuExpanded {
-                                FABMenuItem(icon: "pencil.and.outline", text: "Đo khoảng cách", color: .blue)
-                                FABMenuItem(icon: "square.dashed", text: "Đo diện tích", color: .green)
-                                FABMenuItem(icon: "camera.fill", text: "Chụp ảnh", color: .orange, action: { showCamera = true })
-                                FABMenuItem(icon: "point.topleft.down.curvedto.point.bottomright.up", text: "Ghi Tracklog", color: .red)
-                                FABMenuItem(icon: "mappin.and.ellipse", text: "Thêm điểm", color: .purple)
+                                VStack(spacing: 20) {
+                                    FABMenuItem(icon: "ruler", text: "Đo khoảng cách", color: .blue)
+                                    FABMenuItem(icon: "ruler.fill", text: "Đo diện tích", color: .green)
+                                    FABMenuItem(icon: "camera.fill", text: "Chụp ảnh", color: .orange, action: { showCamera = true })
+                                    FABMenuItem(icon: "record.circle", text: "Ghi Tracklog", color: .red)
+                                    FABMenuItem(icon: "mappin.and.ellipse", text: "Thêm điểm", color: .purple, action: { showAddWaypoint = true })
+                                }
+                                .padding(.bottom, 15)
                             }
 
                             Button(action: { withAnimation { isFABMenuExpanded.toggle() } }) {
@@ -312,6 +328,9 @@ struct MapView: View {
                 }
             }
             .navigationBarHidden(true)
+            .sheet(isPresented: $showAddWaypoint) {
+                AddWaypointView(currentGPS: locationManager.location?.coordinate, mapCenter: mapCenter)
+            }
             .actionSheet(isPresented: $showMapSource) {
                 ActionSheet(title: Text("Chọn lớp nền"), buttons: [
                     .default(Text("Google Satellite")) { styleURL = "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}" },

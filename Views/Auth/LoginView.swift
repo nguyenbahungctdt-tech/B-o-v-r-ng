@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct LoginView: View {
+    @EnvironmentObject var preferences: UserPreferences
     var onLoginSuccess: () -> Void
     @State private var name = ""
     @State private var email = ""
@@ -50,11 +51,11 @@ struct LoginView: View {
                                 .frame(width: 115, height: 110)
                                 .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
 
-                            Image(systemName: "leaf.fill") // Placeholder for R.drawable.app_icon_forestry
+                            Image("app_icon_forestry") // Use real logo asset
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 75, height: 75)
-                                .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
+                                .frame(width: 85, height: 85)
+                                .clipShape(Circle())
                         }
 
                         VStack(spacing: 2) {
@@ -64,7 +65,7 @@ struct LoginView: View {
                                 .tracking(2)
 
                             Text("Công ty TNHH MTV ĐTPT Đại Thành")
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(.white.opacity(0.95))
                                 .padding(.top, -5)
                         }
@@ -223,6 +224,13 @@ struct LoginView: View {
             await MainActor.run {
                 isLoading = false
                 if result.isValid {
+                    preferences.registeredName = name
+                    preferences.registeredEmail = email
+                    preferences.registeredPhone = phone
+                    preferences.registeredUnit = finalUnit
+                    preferences.registeredDept = department
+                    preferences.expiryDate = result.message ?? "N/A"
+                    preferences.permissions = result.permissions
                     onLoginSuccess()
                 } else {
                     errorMessage = result.message ?? "Lỗi xác thực!"

@@ -53,10 +53,21 @@ struct CoordinateConverterView: View {
                         .padding(20)
                         .background(Color.purple.opacity(0.05))
                         .cornerRadius(15)
+                        .overlay(RoundedRectangle(cornerRadius: 15).stroke(Color.purple.opacity(0.1), lineWidth: 1))
 
-                        Image(systemName: "arrow.up.arrow.down")
-                            .font(.title2.bold())
-                            .foregroundColor(.black)
+                        Button(action: {
+                            let tempId = sourceSystemId
+                            sourceSystemId = targetSystemId
+                            targetSystemId = tempId
+                        }) {
+                            Image(systemName: "arrow.up.arrow.down")
+                                .font(.title2.bold())
+                                .foregroundColor(.black)
+                                .padding(10)
+                                .background(Color.white)
+                                .clipShape(Circle())
+                                .shadow(radius: 2)
+                        }
 
                         // Target Section
                         VStack(alignment: .leading, spacing: 15) {
@@ -66,16 +77,15 @@ struct CoordinateConverterView: View {
 
                             SystemPicker(selection: $targetSystemId, systems: systems)
 
-                            if !result1.isEmpty {
-                                HStack(spacing: 15) {
-                                    ResultBox(text: result1)
-                                    ResultBox(text: result2)
-                                }
+                            HStack(spacing: 15) {
+                                ResultBox(text: result1.isEmpty ? "Kết quả X" : result1)
+                                ResultBox(text: result2.isEmpty ? "Kết quả Y" : result2)
                             }
                         }
                         .padding(20)
                         .background(Color.purple.opacity(0.05))
                         .cornerRadius(15)
+                        .overlay(RoundedRectangle(cornerRadius: 15).stroke(Color.purple.opacity(0.1), lineWidth: 1))
 
                         Button(action: performConversion) {
                             Text("CHUYỂN ĐỔI")
