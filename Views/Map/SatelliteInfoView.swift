@@ -42,7 +42,7 @@ struct SatelliteInfoView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(Color.white.opacity(0.95))
-        .cornerRadius(12, corners: [.topLeft, .topRight])
+        .cornerRadius(12) // Standard corner radius for iOS 15 compatibility
         .shadow(radius: 2)
     }
 }

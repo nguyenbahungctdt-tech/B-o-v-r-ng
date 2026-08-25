@@ -86,10 +86,12 @@ struct MapView: View {
     @State private var azimuth: Double = 0.0
     @State private var isLeftExpanded = true
     @State private var isRightExpanded = true
+    @State private var isJournalExpanded = true
     @State private var showMapSource = false
     @State private var showCoordConverter = false
     @State private var showCamera = false
     @State private var isCoordInfoExpanded = true
+    @State private var isFABMenuExpanded = false
 
     @State private var mapCenter: CLLocationCoordinate2D?
     @State private var zoomLevel: Double = 14.0
@@ -101,7 +103,7 @@ struct MapView: View {
                 MapLibreView(centerCoordinate: $mapCenter, zoomLevel: $zoomLevel, styleURL: $styleURL)
                     .edgesIgnoringSafeArea(.all)
 
-                // 1. TOP STATUS BAR
+                // 1. TOP STATUS BAR (Vệ tinh, Sai số, Đám mây)
                 VStack(spacing: 0) {
                     HStack(spacing: 12) {
                         HStack(spacing: 4) {
@@ -115,7 +117,8 @@ struct MapView: View {
 
                         HStack(spacing: 4) {
                             Image(systemName: "scope")
-                            Text("Sai số: ±\(String(format: "%.1f", locationManager.location?.horizontalAccuracy ?? 0))m")
+                            let acc = locationManager.location?.horizontalAccuracy ?? 0
+                            Text("Sai số: ±\(String(format: "%.1f", acc))m")
                         }
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
@@ -135,31 +138,54 @@ struct MapView: View {
                     Spacer()
                 }
 
-                // 2. LEFT SIDEBAR
-                VStack(alignment: .leading, spacing: 10) {
-                    Button(action: { isLeftExpanded.toggle() }) {
-                        Image(systemName: isLeftExpanded ? "chevron.left.circle.fill" : "chevron.right.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(.white)
-                            .background(Color.black.opacity(0.3).clipShape(Circle()))
+                // 2. LEFT SIDEBAR (Utilities & Journals)
+                VStack(alignment: .leading, spacing: 15) {
+                    // Utility Group
+                    VStack(alignment: .leading, spacing: 10) {
+                        Button(action: { isLeftExpanded.toggle() }) {
+                            Image(systemName: isLeftExpanded ? "chevron.left.circle.fill" : "chevron.right.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .background(Color.black.opacity(0.3).clipShape(Circle()))
+                        }
+
+                        if isLeftExpanded {
+                            VStack(spacing: 12) {
+                                SidebarButton(icon: "arrow.left")
+                                SidebarButton(icon: "layers.fill", action: { showMapSource = true })
+                                SidebarButton(icon: "map.fill")
+                                SidebarButton(icon: "arrow.triangle.2.circlepath", action: { showCoordConverter = true })
+                                SidebarButton(icon: "icloud.and.arrow.down.fill")
+                            }
+                            .transition(.move(edge: .leading))
+                        }
                     }
 
-                    if isLeftExpanded {
-                        VStack(spacing: 12) {
-                            SidebarButton(icon: "arrow.left")
-                            SidebarButton(icon: "layers.fill", action: { showMapSource = true })
-                            SidebarButton(icon: "map.fill")
-                            SidebarButton(icon: "arrow.triangle.2.circlepath", action: { showCoordConverter = true })
-                            SidebarButton(icon: "icloud.and.arrow.down.fill")
+                    // Journal Shortcuts
+                    VStack(alignment: .leading, spacing: 10) {
+                        Button(action: { isJournalExpanded.toggle() }) {
+                            Image(systemName: isJournalExpanded ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .background(Color.black.opacity(0.3).clipShape(Circle()))
                         }
-                        .transition(.move(edge: .leading))
+
+                        if isJournalExpanded {
+                            VStack(spacing: 12) {
+                                SidebarButton(icon: "calendar", color: .blue) // Hằng ngày
+                                SidebarButton(icon: "doc.text.fill", color: .red) // Sự vụ
+                                SidebarButton(icon: "leaf.fill", color: .green) // Động thực vật
+                                SidebarButton(icon: "exclamationmark.triangle.fill", color: .orange) // Tác động TN
+                            }
+                            .transition(.move(edge: .leading))
+                        }
                     }
                 }
                 .padding(.leading, 12)
                 .padding(.top, 95)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
 
-                // 3. RIGHT SIDEBAR
+                // 3. RIGHT SIDEBAR (Controls)
                 VStack(alignment: .trailing, spacing: 10) {
                     Button(action: { isRightExpanded.toggle() }) {
                         Image(systemName: isRightExpanded ? "chevron.right.circle.fill" : "chevron.left.circle.fill")
@@ -170,7 +196,7 @@ struct MapView: View {
 
                     if isRightExpanded {
                         VStack(spacing: 12) {
-                            SidebarButton(icon: "chevron.right")
+                            SidebarButton(icon: "gearshape.fill")
                             SidebarButton(icon: "plus", action: { zoomLevel = min(zoomLevel + 1, 20) })
                             SidebarButton(icon: "minus", action: { zoomLevel = max(zoomLevel - 1, 1) })
 
@@ -198,16 +224,16 @@ struct MapView: View {
                 .padding(.trailing, 12)
                 .padding(.top, 95)
 
-                // 4. BOTTOM INFO CARD
+                // 4. BOTTOM INFO CARD (7 Lines)
                 VStack {
                     Spacer()
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text("VN2000 / TM-3 kinh tuyến trục 107.75 + Lâm Đồng")
-                                .font(.system(size: 12, weight: .black))
+                                .font(.system(size: 11, weight: .black))
                                 .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
                             Spacer()
-                            Image(systemName: isCoordInfoExpanded ? "chevron.up" : "chevron.down")
+                            Image(systemName: isCoordInfoExpanded ? "chevron.down" : "chevron.up")
                         }
                         .onTapGesture { isCoordInfoExpanded.toggle() }
 
@@ -216,21 +242,21 @@ struct MapView: View {
                             let vn = CoordinateConverter.shared.wgs84ToVn2000(lat: loc.latitude, lon: loc.longitude, cm: 107.75, zd: 3)
 
                             Text("X: \(String(format: "%.1f", vn.x))  Y: \(String(format: "%.1f", vn.y))")
-                                .font(.system(size: 20, weight: .black))
+                                .font(.system(size: 18, weight: .black))
                                 .foregroundColor(.black)
 
                             Text("Vị trí WGS84: \(String(format: "%.6f", loc.latitude)), \(String(format: "%.6f", loc.longitude))")
-                                .font(.system(size: 12, weight: .bold))
+                                .font(.system(size: 11, weight: .bold))
                                 .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
 
                             Text("Tâm X: \(String(format: "%.1f", vn.x))  Y: \(String(format: "%.1f", vn.y))")
-                                .font(.system(size: 12, weight: .bold))
+                                .font(.system(size: 11, weight: .bold))
                                 .foregroundColor(.gray)
 
                             HStack(spacing: 15) {
                                 let acc = locationManager.location?.horizontalAccuracy ?? 0
                                 Text("±\(String(format: "%.1f", acc))m")
-                                    .font(.system(size: 10, weight: .black))
+                                    .font(.system(size: 9, weight: .black))
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
                                     .background(accColor)
@@ -238,39 +264,49 @@ struct MapView: View {
                                     .cornerRadius(4)
 
                                 Text("Cao: \(String(format: "%.1f", locationManager.location?.altitude ?? 0))m")
-                                    .font(.system(size: 12, weight: .bold))
+                                    .font(.system(size: 11, weight: .bold))
                                     .foregroundColor(.gray)
 
                                 Text("Zoom: \(String(format: "%.1f", zoomLevel))")
-                                    .font(.system(size: 12, weight: .bold))
+                                    .font(.system(size: 11, weight: .bold))
                                     .foregroundColor(Color(red: 102/255, green: 153/255, blue: 102/255))
                             }
                         }
                     }
-                    .padding(16)
+                    .padding(15)
                     .background(Color.white.opacity(0.95))
-                    .cornerRadius(15)
+                    .cornerRadius(18)
                     .shadow(radius: 5)
-                    .padding(.horizontal, 10)
-                    .padding(.bottom, 20)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 25)
                 }
 
-                // 5. FAB (+)
+                // 5. FAB MENU (+)
                 VStack {
                     Spacer()
                     HStack {
                         Spacer()
-                        Button(action: {}) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(.white)
-                                .frame(width: 60, height: 60)
-                                .background(Color(red: 46/255, green: 125/255, blue: 50/255))
-                                .clipShape(Circle())
-                                .shadow(radius: 4)
+                        VStack(spacing: 15) {
+                            if isFABMenuExpanded {
+                                FABMenuItem(icon: "pencil.and.outline", text: "Đo khoảng cách", color: .blue)
+                                FABMenuItem(icon: "square.dashed", text: "Đo diện tích", color: .green)
+                                FABMenuItem(icon: "camera.fill", text: "Chụp ảnh", color: .orange, action: { showCamera = true })
+                                FABMenuItem(icon: "point.topleft.down.curvedto.point.bottomright.up", text: "Ghi Tracklog", color: .red)
+                                FABMenuItem(icon: "mappin.and.ellipse", text: "Thêm điểm", color: .purple)
+                            }
+
+                            Button(action: { withAnimation { isFABMenuExpanded.toggle() } }) {
+                                Image(systemName: isFABMenuExpanded ? "xmark" : "plus")
+                                    .font(.system(size: 24, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 60, height: 60)
+                                    .background(Color(red: 46/255, green: 125/255, blue: 50/255))
+                                    .clipShape(Circle())
+                                    .shadow(radius: 4)
+                            }
                         }
                         .padding(.trailing, 20)
-                        .padding(.bottom, 100)
+                        .padding(.bottom, 110)
                     }
                 }
             }
@@ -296,6 +332,36 @@ struct MapView: View {
     private var accColor: Color {
         let acc = locationManager.location?.horizontalAccuracy ?? 100
         return acc < 15 ? .green : (acc < 50 ? .orange : .red)
+    }
+}
+
+struct FABMenuItem: View {
+    let icon: String
+    let text: String
+    let color: Color
+    var action: (() -> Void)? = nil
+
+    var body: some View {
+        HStack {
+            Text(text)
+                .font(.system(size: 12, weight: .bold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color.white)
+                .cornerRadius(8)
+                .shadow(radius: 2)
+
+            Button(action: { action?() }) {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(width: 45, height: 45)
+                    .background(color)
+                    .clipShape(Circle())
+                    .shadow(radius: 3)
+            }
+        }
+        .transition(.scale.combined(with: .opacity))
     }
 }
 
