@@ -63,9 +63,10 @@ struct LoginView: View {
                                 .foregroundColor(.white)
                                 .tracking(2)
 
-                            Text("Công ty TNHH MTV ĐTPT Đại Thành")
-                                .font(.system(size: 14, weight: .bold))
+                            Text("- ĐẠI THÀNH -")
+                                .font(.system(size: 16, weight: .bold))
                                 .foregroundColor(.white.opacity(0.95))
+                                .padding(.top, -5)
                         }
                     }
                     .padding(.top, 40)

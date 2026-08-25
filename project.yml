@@ -34,13 +34,12 @@ targets:
         product: MapLibre
     settings:
       INFOPLIST_FILE: Info.plist
-      TARGETED_DEVICE_FAMILY: "1"
-      MARKETING_VERSION: "1.2"
-      CURRENT_PROJECT_VERSION: "3"
+      PRODUCT_NAME: "BaoVeRung"
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       CODE_SIGNING_ALLOWED: NO
       CODE_SIGNING_REQUIRED: NO
       CODE_SIGN_IDENTITY: ""
+      GENERATE_INFOPLIST_FILE: NO
 schemes:
   BaoVeRung:
     build:

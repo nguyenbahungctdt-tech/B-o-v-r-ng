@@ -37,14 +37,16 @@ struct ProfileView: View {
                                 .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
                         }
 
-                        Text("BẢO VỆ RỪNG")
-                            .font(.system(size: 24, weight: .black))
-                            .foregroundColor(.white)
-                            .tracking(2)
+                        VStack(spacing: 2) {
+                            Text("BẢO VỆ RỪNG")
+                                .font(.system(size: 24, weight: .black))
+                                .foregroundColor(.white)
+                                .tracking(2)
 
-                        Text("Công ty TNHH MTV ĐTPT Đại Thành")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(.white.opacity(0.9))
+                            Text("- ĐẠI THÀNH -")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white.opacity(0.9))
+                        }
                     }
                     .padding(.top, 30)
 
