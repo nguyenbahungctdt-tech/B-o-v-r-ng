@@ -260,7 +260,7 @@ class CloudSyncRepository {
         let fileURL = URL(fileURLWithPath: localPath)
         let ref = storageRef?.child(remotePath)
         do {
-            _ = try await ref?.putFile(from: fileURL)
+            _ = try await ref?.putFile(from: fileURL, metadata: nil)
             let downloadURL = try await ref?.downloadURL()
             return downloadURL?.absoluteString
         } catch {

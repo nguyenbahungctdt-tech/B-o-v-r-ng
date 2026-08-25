@@ -46,39 +46,3 @@ struct SatelliteInfoView: View {
         .shadow(radius: 2)
     }
 }
-
-extension View {
-    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-        clipShape( RoundedCorner(radius: radius, corners: corners) )
-    }
-}
-
-struct RoundedCorner: Shape {
-    var radius: CGFloat = .infinity
-    var corners: UIRectCorner = .allCorners
-
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-        return Path(path.cgPath)
-    }
-}
-
-struct CompassView: View {
-    var azimuth: Double
-
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(Color.white.opacity(0.8))
-                .frame(width: 50, height: 50)
-                .shadow(radius: 2)
-
-            Image(systemName: "location.north.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 30, height: 30)
-                .foregroundColor(.red)
-                .rotationEffect(.degrees(-azimuth))
-        }
-    }
-}
