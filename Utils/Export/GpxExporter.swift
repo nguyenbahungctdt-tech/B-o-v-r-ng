@@ -11,7 +11,7 @@ struct GpxExporter {
         return formatter
     }()
 
-    func exportTrackToGpx(title: String, points: [GisPoint], startTime: Date) -> String {
+    func exportTrackToGpx(title: String, points: [GpsPoint], startTime: Date) -> String {
         var xml = """
         <?xml version="1.0" encoding="UTF-8"?>
         <gpx version="1.1" creator="Ứng dụng Bảo vệ rừng - Đại Thành"
@@ -27,7 +27,7 @@ struct GpxExporter {
         """
 
         for pt in points {
-            let timeStr = iso8601Formatter.string(from: Date(timeIntervalSince1970: TimeInterval(pt.timestamp / 1000)))
+            let timeStr = iso8601Formatter.string(from: Date(timeIntervalSince1970: TimeInterval(pt.timestampUtc / 1000)))
             xml += """
                   <trkpt lat="\(pt.latitude)" lon="\(pt.longitude)">
                     <ele>\(pt.altitude)</ele>

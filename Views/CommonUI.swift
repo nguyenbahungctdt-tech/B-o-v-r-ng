@@ -41,8 +41,8 @@ struct ForestryIcon: View {
 struct TreeShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let w = rect.width
         let h = rect.height
+        let w = rect.width
         path.addRect(CGRect(x: w * 0.45, y: h * 0.7, width: w * 0.1, height: h * 0.2))
         path.move(to: CGPoint(x: w * 0.5, y: 0))
         path.addLine(to: CGPoint(x: w * 0.25, y: h * 0.3))
@@ -63,7 +63,6 @@ struct TreeShape: Shape {
 struct NotebookShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let w = rect.width
         let h = rect.height
         path.addRoundedRect(in: rect, cornerSize: CGSize(width: 4, height: 4))
         for i in 0..<4 {
@@ -77,8 +76,8 @@ struct NotebookShape: Shape {
 struct FlagShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let w = rect.width
         let h = rect.height
+        let w = rect.width
         path.addRect(CGRect(x: w * 0.2, y: 0, width: 2, height: h))
         path.move(to: CGPoint(x: w * 0.2, y: h * 0.1))
         path.addLine(to: CGPoint(x: w * 0.9, y: h * 0.3))
@@ -91,8 +90,8 @@ struct FlagShape: Shape {
 struct TriangleAlertShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let w = rect.width
         let h = rect.height
+        let w = rect.width
         path.move(to: CGPoint(x: w * 0.5, y: 0))
         path.addLine(to: CGPoint(x: 0, y: h))
         path.addLine(to: CGPoint(x: w, y: h))

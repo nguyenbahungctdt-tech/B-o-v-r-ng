@@ -92,7 +92,7 @@ class MapInfoParser {
         do {
             let mapData = try Data(contentsOf: mapURL)
             let idData = try Data(contentsOf: idURL)
-            let datData = try Data(contentsOf: datURL)
+            let _ = try Data(contentsOf: datURL)
 
             let reader = MapInfoBuffer(data: mapData)
 
