@@ -21,6 +21,7 @@ targets:
       - Utils
       - Views
       - GoogleService-Info.plist
+      - Info.plist
     dependencies:
       - package: Firebase
         product: FirebaseDatabase
