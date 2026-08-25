@@ -96,8 +96,6 @@ struct MapView: View {
     @State private var isCoordInfoExpanded = true
     @State private var isFABMenuExpanded = false
     @State private var showAddWaypoint = false
-    @State private var measureMode: Int = 0 // 0: None, 1: Distance, 2: Area
-    @State private var measurePoints: [CLLocationCoordinate2D] = []
 
     @State private var mapCenter: CLLocationCoordinate2D? = CLLocationCoordinate2D(latitude: 11.9404, longitude: 108.4378)
     @State private var jumpToCoordinate: CLLocationCoordinate2D?
@@ -158,7 +156,7 @@ struct MapView: View {
 
                         if isLeftExpanded {
                             VStack(spacing: 12) {
-                                SidebarButton(icon: "arrow.left")
+                                SidebarButton(icon: "chevron.left") // Back
                                 SidebarButton(icon: "layers.fill", action: { showMapSource = true })
                                 SidebarButton(icon: "map.fill")
                                 SidebarButton(icon: "arrow.triangle.2.circlepath", action: { showCoordConverter = true })
@@ -203,8 +201,7 @@ struct MapView: View {
 
                     if isRightExpanded {
                         VStack(spacing: 12) {
-                            SidebarButton(icon: "gearshape.fill", action: { selectedTab = 3 })
-                            SidebarButton(icon: "ruler.fill")
+                            SidebarButton(icon: "gearshape.fill")
                             SidebarButton(icon: "plus", action: { zoomLevel = min(zoomLevel + 1, 20) })
                             SidebarButton(icon: "minus", action: { zoomLevel = max(zoomLevel - 1, 1) })
 

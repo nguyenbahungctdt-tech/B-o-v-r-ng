@@ -1,4 +1,4 @@
-// Updated 2026-08-25
+// Clean version for final build
 import SwiftUI
 
 struct SatelliteInfoView: View {
@@ -43,7 +43,7 @@ struct SatelliteInfoView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(Color.white.opacity(0.95))
-        .cornerRadius(12) // Standard corner radius for iOS 15 compatibility
+        .cornerRadius(12)
         .shadow(radius: 2)
     }
 }

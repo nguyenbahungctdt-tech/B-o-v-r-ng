@@ -1,4 +1,4 @@
-// Updated 2026-08-25
+// Verified version using GpsPoint and timestampUtc
 import Foundation
 
 struct GpxExporter {
