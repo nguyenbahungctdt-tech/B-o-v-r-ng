@@ -1,3 +1,4 @@
+// Updated 2026-08-25
 import SwiftUI
 
 struct SatelliteInfoView: View {

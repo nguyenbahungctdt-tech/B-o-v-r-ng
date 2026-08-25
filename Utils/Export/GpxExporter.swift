@@ -1,3 +1,4 @@
+// Updated 2026-08-25
 import Foundation
 
 struct GpxExporter {
