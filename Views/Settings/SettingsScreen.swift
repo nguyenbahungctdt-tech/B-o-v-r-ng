@@ -10,6 +10,9 @@ struct SettingsScreen: View {
     @State private var areaUnit = "ha"
     @State private var gpsFilter = "5.0"
 
+    @State private var isSyncing = false
+    @State private var syncMessage: String? = nil
+
     let provinces = ["Lâm Đồng", "Đắk Lắk", "Gia Lai", "Kon Tum", "Đắk Nông"]
     let distUnits = ["m", "km"]
     let areaUnits = ["m2", "ha"]
@@ -56,12 +59,6 @@ struct SettingsScreen: View {
                 }
             }
 
-            @State private var isSyncing = false
-    @State private var syncMessage: String? = nil
-
-    var body: some View {
-        Form {
-            // ... (Sections before)
             Section(header: Text("Tài khoản & Hệ thống").font(.caption.bold())) {
                 Button(action: verifyKey) {
                     Label("Kiểm tra mã kích hoạt", systemImage: "key.fill")
@@ -90,7 +87,15 @@ struct SettingsScreen: View {
                 }
                 .foregroundColor(.red)
             }
-            // ...
+
+            Section(header: Text("Thông tin").font(.caption.bold())) {
+                HStack {
+                    Text("Phiên bản")
+                    Spacer()
+                    Text("1.2 (iOS 100% Match)")
+                }
+                Text("Công ty MTV ĐTPT Đại Thành")
+            }
         }
         .navigationTitle("Cài đặt")
     }
@@ -112,18 +117,5 @@ struct SettingsScreen: View {
                 syncMessage = "Đã đồng bộ thành công lúc \(DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .short))"
             }
         }
-    }
-}
-
-            Section(header: Text("Thông tin").font(.caption.bold())) {
-                HStack {
-                    Text("Phiên bản")
-                    Spacer()
-                    Text("1.2 (iOS 100% Match)")
-                }
-                Text("Công ty MTV ĐTPT Đại Thành")
-            }
-        }
-        .navigationTitle("Cài đặt")
     }
 }
