@@ -1,4 +1,3 @@
-// Verified version using GpsPoint and timestampUtc
 import Foundation
 
 struct GpxExporter {

@@ -259,7 +259,7 @@ class CloudSyncRepository {
     func uploadSurveyPhoto(localPath: String, remotePath: String) async -> String? {
         let fileURL = URL(fileURLWithPath: localPath)
         let ref = storageRef?.child(remotePath)
-        // Correcting the call to use async version properly
+
         return await withCheckedContinuation { continuation in
             ref?.putFile(from: fileURL, metadata: nil) { metadata, error in
                 if let error = error {
