@@ -1,29 +1,6 @@
 import Foundation
 import CoreLocation
 
-enum GisShapeType: String {
-    case POINT, LINE, POLYGON
-}
-
-struct GisPoint: Codable {
-    let latitude: Double
-    let longitude: Double
-    var altitude: Double = 0
-    var timestamp: Int64 = 0
-}
-
-struct GisFeature: Identifiable {
-    let id: String
-    let layerId: Int64
-    let shapeType: GisShapeType
-    let points: [GisPoint]
-    let attributes: [String: String]
-    let minLat: Double
-    let maxLat: Double
-    let minLon: Double
-    let maxLon: Double
-}
-
 class ShapefileParser {
     static let shared = ShapefileParser()
 
@@ -39,7 +16,7 @@ class ShapefileParser {
 
         do {
             let shpData = try Data(contentsOf: shpURL)
-            let dbfData = try Data(contentsOf: dbfURL)
+            let _ = try Data(contentsOf: dbfURL) // Read dbfData but prefix with _ to fix warning
 
             // Basic SHP Header check
             let fileCode = Int32(bigEndian: shpData.subdata(in: 0..<4).withUnsafeBytes { $0.load(as: Int32.self) })
@@ -56,7 +33,7 @@ class ShapefileParser {
 
                 let shapeType = Int32(littleEndian: recordData.subdata(in: 0..<4).withUnsafeBytes { $0.load(as: Int32.self) })
 
-                var points: [GisPoint] = []
+                var points: [GpsPoint] = []
                 var gType = GisShapeType.POINT
 
                 switch shapeType {
@@ -104,11 +81,11 @@ class ShapefileParser {
         return features
     }
 
-    private func toGpsPoint(x: Double, y: Double, cm: Double, zd: Int) -> GisPoint {
+    private func toGpsPoint(x: Double, y: Double, cm: Double, zd: Int) -> GpsPoint {
         if x > 1000 || y > 1000 {
             let result = CoordinateConverter.shared.vn2000ToWgs84(x: x, y: y, cm: cm, zd: zd)
-            return GisPoint(latitude: result.lat, longitude: result.lon)
+            return GpsPoint(latitude: result.lat, longitude: result.lon)
         }
-        return GisPoint(latitude: y, longitude: x)
+        return GpsPoint(latitude: y, longitude: x)
     }
 }

@@ -166,7 +166,7 @@ class MapInfoParser {
         case 4, 6: // Pline
             let n = Int(reader.getInt32(logOff + 20))
             if n > 0 && n <= MAX_PTS {
-                var pts: [GisPoint] = []
+                var pts: [GpsPoint] = []
                 for i in 0..<n {
                     pts.append(toGps(ix: Int(reader.getInt32(logOff + 24 + i * 8)), iy: Int(reader.getInt32(logOff + 28 + i * 8)), p: params))
                 }
@@ -182,7 +182,7 @@ class MapInfoParser {
                 }
                 let fChain = Int(reader.getInt32(logOff + 28 + nRings * 4))
                 if fChain > 0 {
-                    var allPts: [GisPoint] = []
+                    var allPts: [GpsPoint] = []
                     readPointChain(reader: reader, logOff: pl(fChain), total: nTotal, pts: &allPts, p: params)
 
                     var start = 0
@@ -200,7 +200,7 @@ class MapInfoParser {
         return features
     }
 
-    private func readPointChain(reader: MapInfoBuffer, logOff: Int, total: Int, pts: inout [GisPoint], p: MapInfoParams) {
+    private func readPointChain(reader: MapInfoBuffer, logOff: Int, total: Int, pts: inout [GpsPoint], p: MapInfoParams) {
         var cLog = logOff
         var read = 0
         while read < total && cLog > 0 && cLog < reader.count {
@@ -223,19 +223,19 @@ class MapInfoParser {
         }
     }
 
-    private func toGps(ix: Int, iy: Int, p: MapInfoParams) -> GisPoint {
+    private func toGps(ix: Int, iy: Int, p: MapInfoParams) -> GpsPoint {
         let x = p.centerX + (Double(ix) * p.resX)
         let y = p.centerY + (Double(iy) * p.resY)
         let res = CoordinateConverter.shared.vn2000ToWgs84(x: x, y: y, cm: p.cm, zd: p.zd)
-        return GisPoint(latitude: res.lat, longitude: res.lon)
+        return GpsPoint(latitude: res.lat, longitude: res.lon)
     }
 
-    private func wrap(idx: Int, ring: Int, type: GisShapeType, pts: [GisPoint]) -> GisFeature {
+    private func wrap(idx: Int, ring: Int, type: GisShapeType, pts: [GpsPoint]) -> GisFeature {
         let minLat = pts.map { $0.latitude }.min() ?? 0
         let maxLat = pts.map { $0.latitude }.max() ?? 0
         let minLon = pts.map { $0.longitude }.min() ?? 0
         let maxLon = pts.map { $0.longitude }.max() ?? 0
-        return GisFeature(id: "mi_\(idx)_\(ring)", layerId: 0, shapeType: type, points: pts, attributes: [:], minLat: minLat, maxLat: maxLat, minLon: minLon, maxLon: maxLon)
+        return GisFeature(id: "mi_\(idx)_\(ring)", layerId: 0, shapeType: type, points: pts, attributes: [:], minLat: minLat, maxLat: maxLat, minLon: minLon, maxLon: maxLon, centroidLat: (minLat+maxLat)/2, centroidLon: (minLon+maxLon)/2)
     }
 
     private func findFile(folder: URL, base: String, ext: String) -> URL? {
