@@ -5,177 +5,212 @@ struct LoginView: View {
     @State private var name = ""
     @State private var email = ""
     @State private var phone = ""
-    @State private var unit = "Công ty TNHH MTV ĐTPT ĐẠI THÀNH"
-    @State private var department = "Ban Giám Đốc"
+    @State private var unitSelection = "Công ty TNHH MTV ĐTPT ĐẠI THÀNH"
+    @State private var otherUnit = ""
+    @State private var department = "Phòng QL,SD&PTR"
     @State private var activationKey = ""
-    @State private var isOffline = false
     @State private var isLoading = false
     @State private var errorMessage: String? = nil
 
     let units = ["Công ty TNHH MTV ĐTPT ĐẠI THÀNH", "Khác"]
-    let departments = ["Ban Giám Đốc", "Phòng QL,SD&PTR", "Phân Trường I", "Phân Trường II", "Phân Trường III", "Phân Trường IV", "Phân Trường V", "Phân Trường VI", "Khác"]
+    let departments = [
+        "Ban Giám Đốc",
+        "Phòng QL,SD&PTR",
+        "Phân Trường I",
+        "Phân Trường II",
+        "Phân Trường III",
+        "Phân Trường IV",
+        "Phân Trường V",
+        "Phân Trường VI",
+        "Khác"
+    ]
 
     var body: some View {
         ZStack(alignment: .top) {
             // 1. Forest Background Gradient
-            LinearGradient(gradient: Gradient(colors: [Color(red: 46/255, green: 125/255, blue: 50/255), Color.green.opacity(0.7), .white]), startPoint: .top, endPoint: .bottom)
-                .frame(height: 350)
-                .edgesIgnoringSafeArea(.top)
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(red: 46/255, green: 125/255, blue: 50/255),
+                    Color(red: 102/255, green: 153/255, blue: 102/255).opacity(0.8),
+                    .white
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 380)
+            .edgesIgnoringSafeArea(.top)
 
             ScrollView {
-                VStack(spacing: 25) {
-                    // 2. App Logo
-                    VStack(spacing: 15) {
+                VStack(spacing: 20) {
+                    // 2. App Logo & Title
+                    VStack(spacing: 12) {
                         ZStack {
                             Circle()
                                 .fill(Color.white)
-                                .frame(width: 110, height: 110)
-                                .shadow(radius: 10)
+                                .frame(width: 115, height: 110)
+                                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
 
-                            Image(systemName: "leaf.fill") // Placeholder for app_icon_forestry
+                            Image(systemName: "leaf.fill") // Placeholder for R.drawable.app_icon_forestry
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 70, height: 70)
-                                .foregroundColor(.green)
+                                .frame(width: 75, height: 75)
+                                .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
                         }
 
-                        VStack(spacing: 4) {
+                        VStack(spacing: 2) {
                             Text("BẢO VỆ RỪNG")
-                                .font(.system(size: 26, weight: .black))
+                                .font(.system(size: 28, weight: .black))
                                 .foregroundColor(.white)
                                 .tracking(2)
 
                             Text("Công ty TNHH MTV ĐTPT Đại Thành")
                                 .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.white.opacity(0.9))
+                                .foregroundColor(.white.opacity(0.95))
                         }
                     }
                     .padding(.top, 40)
 
-                    // 3. Registration Form
-                    VStack(alignment: .leading, spacing: 16) {
+                    // 3. Main Registration Card
+                    VStack(alignment: .leading, spacing: 18) {
                         Text("ĐĂNG KÝ THÔNG TIN CÁN BỘ")
                             .font(.system(size: 16, weight: .black))
-                            .foregroundColor(.green)
+                            .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
+                            .padding(.bottom, 5)
 
-                        VStack(spacing: 12) {
-                            LoginTextField(icon: "person.fill", placeholder: "Họ tên cán bộ thực hiện", text: $name)
-                            LoginTextField(icon: "envelope.fill", placeholder: "Địa chỉ Gmail", text: $email)
-                            LoginTextField(icon: "phone.fill", placeholder: "Số điện thoại liên lạc", text: $phone)
-                                .keyboardType(.numberPad)
+                        Group {
+                            LoginField(icon: "person.fill", placeholder: "Họ tên cán bộ thực hiện", text: $name, hint: "Gợi ý: Nguyễn Bá Hưng")
+                            LoginField(icon: "envelope.fill", placeholder: "Địa chỉ Gmail", text: $email, hint: "Gợi ý: nguyenbahung.ctdt@gmail.com")
+                            LoginField(icon: "phone.fill", placeholder: "Số điện thoại liên lạc", text: $phone, hint: "Gợi ý: 0986407464", keyboardType: .numberPad)
+                        }
 
-                            // Unit Picker
-                            VStack(alignment: .leading, spacing: 4) {
-                                Label("Đơn vị công tác", systemImage: "building.2.fill")
-                                    .font(.caption.bold())
-                                    .foregroundColor(.green)
-                                Picker("Đơn vị", selection: $unit) {
+                        // Unit Picker with "Other" logic
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Image(systemName: "building.2.fill")
+                                    .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
+                                    .frame(width: 20)
+                                Text("Đơn vị công tác")
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundColor(.gray)
+                                Spacer()
+                                Picker("", selection: $unitSelection) {
                                     ForEach(units, id: \.self) { Text($0) }
                                 }
-                                .pickerStyle(MenuPickerStyle())
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(10)
-                                .background(Color.gray.opacity(0.1))
-                                .cornerRadius(10)
+                                .pickerStyle(.menu)
+                                .font(.system(size: 14, weight: .bold))
                             }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.gray.opacity(0.05))
+                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.2), lineWidth: 1))
 
-                            // Department Picker
-                            VStack(alignment: .leading, spacing: 4) {
-                                Label("Bộ phận / Phân trường", systemImage: "forest.fill")
-                                    .font(.caption.bold())
-                                    .foregroundColor(.green)
-                                Picker("Bộ phận", selection: $department) {
+                            Text("Gợi ý: Công ty TNHH MTV ĐTPT ĐẠI THÀNH")
+                                .font(.system(size: 10))
+                                .foregroundColor(.gray.opacity(0.8))
+                                .padding(.leading, 12)
+                        }
+
+                        if unitSelection == "Khác" {
+                            LoginField(icon: "building.2.fill", placeholder: "Nhập tên đơn vị công tác", text: $otherUnit, hint: "")
+                        }
+
+                        // Department Picker
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Image(systemName: "forest.fill")
+                                    .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
+                                    .frame(width: 20)
+                                Text("Bộ phận công tác")
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundColor(.gray)
+                                Spacer()
+                                Picker("", selection: $department) {
                                     ForEach(departments, id: \.self) { Text($0) }
                                 }
-                                .pickerStyle(MenuPickerStyle())
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(10)
-                                .background(Color.gray.opacity(0.1))
-                                .cornerRadius(10)
+                                .pickerStyle(.menu)
                             }
-
-                            LoginTextField(icon: "key.fill", placeholder: "Mã kích hoạt ứng dụng", text: $activationKey)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.gray.opacity(0.05))
+                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.2), lineWidth: 1))
                         }
+
+                        LoginField(icon: "key.fill", placeholder: "Mã kích hoạt ứng dụng", text: $activationKey, hint: "Nhập Key do quản trị cấp")
 
                         if let error = errorMessage {
                             Text(error)
-                                .font(.caption.bold())
-                                .foregroundColor(.red)
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding()
                                 .frame(maxWidth: .infinity)
-                                .padding(8)
-                                .background(Color.red.opacity(0.1))
-                                .cornerRadius(8)
+                                .background(Color.red.opacity(0.8))
+                                .cornerRadius(12)
                         }
 
-                        Button(action: performLogin) {
-                            HStack {
-                                if isLoading {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                } else {
-                                    Image(systemName: "icloud.and.arrow.up.fill")
-                                    Text("KÍCH HOẠT VÀ ĐĂNG KÝ")
-                                        .fontWeight(.black)
+                        // Buttons
+                        VStack(spacing: 12) {
+                            Button(action: performLogin) {
+                                HStack {
+                                    if isLoading {
+                                        ProgressView().tint(.white)
+                                    } else {
+                                        Image(systemName: "icloud.and.arrow.up.fill")
+                                        Text("KÍCH HOẠT VÀ ĐĂNG KÝ")
+                                            .fontWeight(.black)
+                                            .tracking(1)
+                                    }
                                 }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Color(red: 46/255, green: 125/255, blue: 50/255))
+                                .foregroundColor(.white)
+                                .cornerRadius(14)
+                                .shadow(color: Color.green.opacity(0.3), radius: 5, x: 0, y: 3)
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(isLoading ? Color.gray : Color.green)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
-                        }
-                        .disabled(isLoading)
-                        .padding(.top, 10)
+                            .disabled(isLoading)
 
-                        Button(action: {
-                            isOffline = true
-                            onLoginSuccess()
-                        }) {
-                            HStack {
-                                Image(systemName: "wifi.slash")
+                            Button(action: { onLoginSuccess() }) {
                                 Text("Dùng thử ngoại tuyến")
-                                    .fontWeight(.semibold)
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundColor(.gray)
                             }
-                            .frame(maxWidth: .infinity)
-                            .foregroundColor(.gray)
                         }
+                        .padding(.top, 10)
                     }
-                    .padding(24)
+                    .padding(25)
                     .background(Color.white)
                     .cornerRadius(28)
-                    .shadow(radius: 5)
+                    .shadow(color: .black.opacity(0.1), radius: 15, x: 0, y: 10)
+                    .padding(.horizontal, 20)
 
                     // 4. Footer
-                    VStack {
+                    VStack(spacing: 4) {
                         Text("Hệ thống quản lý dữ liệu Bảo vệ rừng - Đại Thành")
                             .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.gray)
                         Text("Tác giả: Nguyễn Bá Hưng - 0983.407.464")
                             .font(.system(size: 11))
-                            .foregroundColor(.gray)
+                            .foregroundColor(.gray.opacity(0.7))
                     }
-                    .padding(.bottom, 20)
+                    .padding(.vertical, 30)
                 }
-                .padding(.horizontal, 20)
             }
         }
     }
 
     private func performLogin() {
         guard !name.isEmpty, !email.isEmpty, !activationKey.isEmpty else {
-            errorMessage = "Vui lòng điền đầy đủ thông tin!"
+            errorMessage = "Vui lòng nhập đầy đủ thông tin!"
             return
         }
 
         isLoading = true
         errorMessage = nil
 
-        let userInfo = [
-            "name": name,
-            "email": email,
-            "phone": phone,
-            "unit": unit,
-            "dept": department
-        ]
+        let finalUnit = unitSelection == "Khác" ? otherUnit : unitSelection
+        let userInfo = ["name": name, "email": email, "phone": phone, "unit": finalUnit, "dept": department]
 
         Task {
             let result = await CloudSyncRepository.shared.verifyActivationKey(
@@ -184,41 +219,48 @@ struct LoginView: View {
                 userInfo: userInfo
             )
 
-            DispatchQueue.main.async {
+            await MainActor.run {
                 isLoading = false
                 if result.isValid {
-                    // Update global personnel info
-                    Task {
-                        await CloudSyncRepository.shared.updatePersonnelInfo(
-                            user: userInfo,
-                            registrationKey: activationKey,
-                            permissions: result.permissions,
-                            canSync: result.canSync
-                        )
-                    }
                     onLoginSuccess()
                 } else {
-                    errorMessage = result.message ?? "Lỗi xác thực không xác định"
+                    errorMessage = result.message ?? "Lỗi xác thực!"
                 }
             }
         }
     }
 }
 
-struct LoginTextField: View {
+struct LoginField: View {
     let icon: String
     let placeholder: String
     @Binding var text: String
+    let hint: String
+    var keyboardType: UIKeyboardType = .default
 
     var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .foregroundColor(.green)
-                .frame(width: 20)
-            TextField(placeholder, text: $text)
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
+                    .frame(width: 20)
+
+                TextField(placeholder, text: $text)
+                    .font(.system(size: 15, weight: .medium))
+                    .keyboardType(keyboardType)
+            }
+            .padding(.horizontal, 15)
+            .padding(.vertical, 14)
+            .background(Color.gray.opacity(0.05))
+            .cornerRadius(14)
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.gray.opacity(0.15), lineWidth: 1))
+
+            if !hint.isEmpty {
+                Text(hint)
+                    .font(.system(size: 10))
+                    .foregroundColor(.gray.opacity(0.6))
+                    .padding(.leading, 10)
+            }
         }
-        .padding()
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(12)
     }
 }

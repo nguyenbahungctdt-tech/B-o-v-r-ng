@@ -2,131 +2,180 @@ import SwiftUI
 
 struct DataManagementView: View {
     @State private var selectedTab = 0
-    let tabs = ["THEO NGÀY", "HÌNH ẢNH", "ĐIỂM", "TRACKLOG", "ĐƯỜNG", "VÙNG", "SỰ VỤ", "ĐỘNG THỰC VẬT", "TÁC ĐỘNG TN", "HẰNG NGÀY"]
+    let tabs = ["THEO NGÀY", "HÌNH ẢNH", "ĐIỂM", "TRACKLOG", "ĐƯỜNG (VỆT)", "VÙNG", "SỰ VỤ", "ĐỘNG THỰC VẬT", "TÁC ĐỘNG TN", "HẰNG NGÀY"]
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Scrollable Tab Header like Android
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 20) {
-                    ForEach(0..<tabs.count, id: \.self) { index in
-                        Button(action: { selectedTab = index }) {
+        NavigationView {
+            VStack(spacing: 0) {
+                // 1. Horizontal Scrollable Tab Header
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 20) {
+                        ForEach(0..<tabs.count, id: \.self) { index in
                             VStack(spacing: 8) {
                                 Text(tabs[index])
                                     .font(.system(size: 11, weight: .bold))
-                                    .foregroundColor(selectedTab == index ? .green : .gray)
+                                    .foregroundColor(selectedTab == index ? Color(red: 46/255, green: 125/255, blue: 50/255) : .gray)
 
                                 Rectangle()
-                                    .fill(selectedTab == index ? .green : .clear)
+                                    .fill(selectedTab == index ? Color(red: 46/255, green: 125/255, blue: 50/255) : Color.clear)
                                     .frame(height: 2)
                             }
+                            .onTapGesture { selectedTab = index }
                         }
                     }
+                    .padding(.horizontal)
+                    .padding(.top, 10)
                 }
-                .padding(.horizontal)
-                .padding(.top, 10)
-            }
-            .background(Color.white)
-            .shadow(color: .black.opacity(0.05), radius: 2, y: 2)
+                .background(Color.white)
+                .shadow(color: .black.opacity(0.05), radius: 2, y: 2)
 
-            // List Content
-            List {
-                if selectedTab == 0 { // THEO NGÀY
-                    Section(header: DateHeaderView(date: "24/08/2026", count: 5)) {
-                        DataCardView(title: "Phá rừng trái pháp luật", type: "patrol", color: .red)
-                        DataCardView(title: "Tuyến tuần tra lô 1", type: "track", color: .orange)
-                        DataCardView(title: "Ảnh hiện trường cây đổ", type: "image", color: .blue)
+                // 2. List Content
+                ScrollView {
+                    VStack(spacing: 15) {
+                        // Date Header like Android image
+                        HStack {
+                            Text("NGÀY 24/08/2026 (2 mục)")
+                                .font(.system(size: 13, weight: .black))
+                                .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
+                            Spacer()
+                            HStack(spacing: 4) {
+                                Image(systemName: "paperplane.fill")
+                                Text("BÁO CÁO NGÀY")
+                            }
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color(red: 46/255, green: 125/255, blue: 50/255))
+                            .cornerRadius(6)
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color.green.opacity(0.1))
+                        .cornerRadius(8)
+                        .padding(.horizontal)
+
+                        // Sample Cards
+                        DataCard(title: "Ảnh 03", coords: "VN2000: X=492005, Y=1388810")
+                        DataCard(title: "Ảnh 02", coords: "VN2000: X=491943, Y=1388735")
                     }
-                } else if selectedTab == 1 { // HÌNH ẢNH
-                    DataCardView(title: "Ảnh hiện trường lô 3", type: "image", color: .blue)
-                } else if selectedTab == 6 { // SỰ VỤ
-                    DataCardView(title: "Cháy rừng tiểu khu 12", type: "patrol", color: .red)
-                } else if selectedTab == 3 { // TRACKLOG
-                    DataCardView(title: "Tuyến tuần tra ngày 23/08", type: "track", color: .orange)
-                } else {
-                    Text("Danh sách \(tabs[selectedTab]) trống")
-                        .foregroundColor(.gray)
-                        .padding()
+                    .padding(.vertical)
                 }
+                .background(Color(red: 245/255, green: 245/255, blue: 245/255))
             }
-            .listStyle(PlainListStyle())
+            .navigationTitle("QUẢN LÝ DỮ LIỆU THỰC ĐỊA")
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .navigationTitle("QUẢN LÝ DỮ LIỆU")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
-struct DateHeaderView: View {
-    let date: String
-    let count: Int
-    var body: some View {
-        HStack {
-            Text("NGÀY \(date) (\(count) mục)")
-                .font(.system(size: 12, weight: .black))
-                .foregroundColor(.green)
-            Spacer()
-            Button("BÁO CÁO NGÀY") {}
-                .font(.system(size: 10, weight: .bold))
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(6)
-        }
-        .padding(.vertical, 5)
-    }
-}
-
-struct DataCardView: View {
+struct DataCard: View {
     let title: String
-    let type: String
-    let color: Color
+    let coords: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 12) {
-                // Icon based on type
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 15) {
+                // Preview Image with overlay border
                 ZStack {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(color.opacity(0.15))
-                        .frame(width: 50, height: 50)
+                    Image(systemName: "photo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 85, height: 85)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(12)
 
-                    if type == "patrol" {
-                        ForestryIcon(type: "notebook", color: .red, size: 25)
-                    } else if type == "track" {
-                        Image(systemName: "point.topleft.down.curvedto.point.bottomright.up")
-                            .foregroundColor(.orange)
-                    } else {
-                        Image(systemName: "camera.fill")
-                            .foregroundColor(.blue)
-                    }
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                        .frame(width: 85, height: 85)
                 }
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Text(title)
-                            .font(.system(size: 14, weight: .black))
+                            .font(.system(size: 17, weight: .black))
+                            .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
                         Spacer()
-                        Image(systemName: "icloud.circle.fill")
-                            .foregroundColor(.green)
-                            .font(.caption)
+                        HStack(spacing: 12) {
+                            Image(systemName: "cloud.fill")
+                                .foregroundColor(.gray.opacity(0.5))
+                            Image(systemName: "eye.fill")
+                                .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
+                            Image(systemName: "trash.fill")
+                                .foregroundColor(.red)
+                        }
+                        .font(.system(size: 16))
                     }
 
-                    Text("VN2000: X=1,321,450, Y=456,781")
-                        .font(.system(size: 11))
-                        .foregroundColor(.gray)
+                    Text(coords)
+                        .font(.system(size: 13, weight: .bold))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color.gray.opacity(0.08))
+                        .cornerRadius(8)
 
-                    HStack {
-                        Text("CHI TIẾT")
-                        Text("DẪN ĐƯỜNG")
-                        Text("BÁO CÁO")
+                    // 6 Format Dots like Android
+                    HStack(spacing: 8) {
+                        Text("Định dạng:")
+                            .font(.system(size: 11))
+                            .foregroundColor(.gray)
+
+                        let colors: [Color] = [.blue, .red, .green, .yellow, .purple, .orange]
+                        ForEach(0..<colors.count, id: \.self) { i in
+                            Circle()
+                                .fill(colors[i])
+                                .frame(width: 24, height: 24)
+                                .shadow(radius: 1)
+                        }
                     }
-                    .font(.system(size: 10, weight: .black))
-                    .foregroundColor(.green)
-                    .padding(.top, 4)
+                    .padding(.top, 2)
                 }
             }
+
+            Divider().background(Color.gray.opacity(0.2))
+
+            // Action Row
+            HStack(spacing: 20) {
+                ActionLabel(icon: "pencil", text: "SỬA")
+                ActionLabel(icon: "info.circle", text: "CHI TIẾT")
+
+                Image(systemName: "envelope.fill")
+                    .foregroundColor(.red)
+                    .font(.system(size: 18))
+
+                Spacer()
+
+                HStack(spacing: 6) {
+                    Image(systemName: "location.north.fill")
+                    Text("DẪN ĐƯỜNG")
+                }
+                .font(.system(size: 11, weight: .black))
+                .padding(.horizontal, 15)
+                .padding(.vertical, 8)
+                .background(Color(red: 46/255, green: 125/255, blue: 50/255))
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                .shadow(color: .green.opacity(0.2), radius: 3, x: 0, y: 2)
+            }
         }
-        .padding(.vertical, 8)
+        .padding(18)
+        .background(Color.white)
+        .cornerRadius(22)
+        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
+        .padding(.horizontal)
+    }
+}
+
+struct ActionLabel: View {
+    let icon: String
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+            Text(text)
+        }
+        .font(.system(size: 11, weight: .black))
+        .foregroundColor(Color(red: 46/255, green: 125/255, blue: 50/255))
     }
 }
