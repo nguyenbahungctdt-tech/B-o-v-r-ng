@@ -12,15 +12,16 @@ targets:
   BaoVeRung:
     type: application
     platform: iOS
-    deploymentTarget: "15.0"
+    deploymentTarget: "15.5"
     sources:
-      - BaoVeRungApp.swift
-      - Assets.xcassets
-      - Data
-      - Repositories
-      - Utils
-      - Views
-      - GoogleService-Info.plist
+      - path: .
+        excludes:
+          - "project.yml"
+          - ".github"
+          - "README.md"
+          - ".gitignore"
+          - "*.xcodeproj"
+          - "build"
     dependencies:
       - package: Firebase
         product: FirebaseDatabase
@@ -34,6 +35,9 @@ targets:
         product: MapLibre
     settings:
       GENERATE_INFOPLIST_FILE: YES
+      TARGETED_DEVICE_FAMILY: "1"
+      MARKETING_VERSION: "1.2"
+      CURRENT_PROJECT_VERSION: "3"
       INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Ứng dụng cần truy cập vị trí để ghi lại lộ trình tuần tra và tọa độ hiện trường."
       INFOPLIST_KEY_NSCameraUsageDescription: "Ứng dụng cần truy cập máy ảnh để chụp ảnh hiện trường có dấu chìm tọa độ."
       INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Ứng dụng cần truy cập thư viện ảnh để đính kèm hình ảnh vào báo cáo."
