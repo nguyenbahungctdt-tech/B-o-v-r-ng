@@ -22,6 +22,21 @@ struct DatumShift: Codable {
 
 class CoordinateConverter {
     static let shared = CoordinateConverter()
+    var systems: [CoordinateSystem] = []
+
+    init() {
+        loadSystems()
+    }
+
+    private func loadSystems() {
+        guard let url = Bundle.main.url(forResource: "coordinate_systems", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let decoded = try? JSONDecoder().decode([CoordinateSystem].self, from: data) else {
+            systems = [CoordinateSystem(id: "EPSG:4326", name: "WGS 84 (Số thập phân)", projection: "WGS84")]
+            return
+        }
+        systems = decoded
+    }
 
     private let a_wgs84: Double = 6378137.0
     private let f_wgs84: Double = 1.0 / 298.257223563
@@ -112,27 +127,29 @@ class CoordinateConverter {
         return (x, y)
     }
 
-    private func inverseTransverseMercator(x: Double, y: Double, cm: Double, k0: Double) -> (lat: Double, lon: Double) {
-        let e2 = 2 * f_wgs84 - f_wgs84 * f_wgs84
-        let ep2 = e2 / (1 - e2)
-        let lam0 = cm * .pi / 180.0
-        let xx = x - 500000.0
-        let m = y / k0
+    func formatDecimalToDms(decimal: Double) -> String {
+        let absV = abs(decimal)
+        let d = Int(absV)
+        let m = Int((absV - Double(d)) * 60)
+        let s = Int((absV - Double(d) - Double(m) / 60.0) * 3600)
+        return "\(decimal < 0 ? "-" : "")\(d)°\(String(format: "%02d", m))'\(String(format: "%02d", s))\""
+    }
 
-        let mu = m / (a_wgs84 * (1.0 - e2 / 4.0 - 3.0 * e2 * e2 / 64.0 - 5.0 * e2 * e2 * e2 / 256.0))
-        let e1 = (1.0 - sqrt(1.0 - e2)) / (1.0 + sqrt(1.0 - e2))
+    func formatCoordinateDisplay(x: Double, y: Double, sys: CoordinateSystem, prov: String = "") -> String {
+        if sys.projection == "WGS84" {
+            if sys.id == "WGS84_DMS" {
+                return "Lat: \(formatDecimalToDms(y)), Lon: \(formatDecimalToDms(x))"
+            }
+            return String(format: "Lat: %.6f, Lon: %.6f", y, x)
+        }
 
-        let p1 = mu + (3.0 * e1 / 2.0 - 27.0 * pow(e1, 3) / 32.0) * sin(2.0 * mu) + (21.0 * pow(e1, 2) / 16.0 - 55.0 * pow(e1, 4) / 32.0) * sin(4.0 * mu) + (151.0 * pow(e1, 3) / 96.0) * sin(6.0 * mu)
+        let xStr = String(format: "%.1f", x)
+        let yStr = String(format: "%.1f", y)
 
-        let n1 = a_wgs84 / sqrt(1.0 - e2 * sin(p1) * sin(p1))
-        let t1 = tan(p1) * tan(p1)
-        let c1 = ep2 * cos(p1) * cos(p1)
-        let r1 = a_wgs84 * (1.0 - e2) / pow(1.0 - e2 * sin(p1) * sin(p1), 1.5)
-        let d = xx / (n1 * k0)
-
-        let lat = p1 - (n1 * tan(p1) / r1) * (pow(d, 2) / 2.0 - (5.0 + 3.0 * t1 + 10.0 * c1 - 4.0 * c1 * c1 - 9.0 * ep2) * pow(d, 4) / 24.0 + (61.0 + 90.0 * t1 + 298.0 * c1 + 45.0 * pow(t1, 2) - 252.0 * ep2 - 3.0 * pow(c1, 2)) * pow(d, 6) / 720.0)
-        let lon = lam0 + (d - (1.0 + 2.0 * t1 + c1) * pow(d, 3) / 6.0 + (5.0 - 2.0 * c1 + 28.0 * t1 - 3.0 * pow(c1, 2) + 8.0 * ep2 + 24.0 * pow(t1, 2)) * pow(d, 5) / 120.0) / cos(p1)
-
-        return (lat * 180.0 / .pi, lon * 180.0 / .pi)
+        if sys.projection == "VN2000" {
+            let cmStr = String(format: "%.2f", sys.centralMeridian).replacingOccurrences(of: ".00", with: "").replacingOccurrences(of: ".", with: "°") + "'"
+            return "VN2000 Múi \(sys.zoneDegrees)° - \(cmStr) (\(prov)): X=\(xStr), Y=\(yStr)"
+        }
+        return "\(sys.name): X=\(xStr), Y=\(yStr)"
     }
 }

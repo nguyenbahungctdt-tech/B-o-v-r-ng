@@ -22,6 +22,8 @@ targets:
       - Views
       - path: GoogleService-Info.plist
         type: resource
+      - path: Data/coordinate_systems.json
+        type: resource
     dependencies:
       - package: Firebase
         product: FirebaseDatabase
