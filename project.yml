@@ -21,7 +21,6 @@ targets:
       - Utils
       - Views
       - GoogleService-Info.plist
-      - Info.plist
     dependencies:
       - package: Firebase
         product: FirebaseDatabase
@@ -42,3 +41,10 @@ targets:
       CODE_SIGNING_ALLOWED: NO
       CODE_SIGNING_REQUIRED: NO
       CODE_SIGN_IDENTITY: ""
+schemes:
+  BaoVeRung:
+    build:
+      targets:
+        BaoVeRung: all
+    archive:
+      config: Release
