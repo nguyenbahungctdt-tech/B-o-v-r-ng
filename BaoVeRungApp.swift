@@ -4,7 +4,16 @@ import FirebaseCore
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    FirebaseApp.configure()
+    // Safe initialization: Only configure if the REAL plist exists and is valid
+    if let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
+       let dict = NSDictionary(contentsOfFile: path),
+       let projectID = dict["PROJECT_ID"] as? String,
+       !projectID.contains("baoverung-xxxx") { // Check if it's not my dummy ID
+        FirebaseApp.configure()
+        print("Firebase configured successfully.")
+    } else {
+        print("Skipping Firebase configuration: Valid GoogleService-Info.plist not found.")
+    }
     return true
   }
 }
